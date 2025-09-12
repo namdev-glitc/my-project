@@ -1,0 +1,75 @@
+# -*- mode: python ; coding: utf-8 -*-
+
+block_cipher = None
+
+a = Analysis(
+    ['backend/run.py'],
+    pathex=['.'],
+    binaries=[],
+    datas=[
+        ('backend/app', 'app'),
+        ('backend/static', 'static'),
+        ('backend/exports', 'exports'),
+        ('backend/qr_images', 'qr_images'),
+        ('backend/invitations', 'invitations'),
+        ('frontend/build', 'frontend/build'),
+        ('frontend/public', 'frontend/public'),
+    ],
+    hiddenimports=[
+        'uvicorn',
+        'fastapi',
+        'sqlalchemy',
+        'pandas',
+        'openpyxl',
+        'qrcode',
+        'jinja2',
+        'pydantic',
+        'python-multipart',
+        'python-jose',
+        'passlib',
+        'bcrypt',
+        'email-validator',
+        'react',
+        'react-dom',
+        'react-router-dom',
+        'axios',
+        'lucide-react',
+        'react-hot-toast',
+        'react-query',
+        'recharts',
+        'tailwindcss',
+    ],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='Guest_Management_System',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=True,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon='backend/static/favicon.ico'
+)

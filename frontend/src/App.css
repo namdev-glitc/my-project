@@ -1,0 +1,31 @@
+/* App specific styles - EXP Solution Brand */
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0D1421 0%, #1E3A8A 50%, #3B82F6 100%);
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+
+

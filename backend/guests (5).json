@@ -1,0 +1,253 @@
+[
+  {
+    "title": "Mr",
+    "name": "Nguyễn Cường",
+    "role": "CEO",
+    "organization": "Công ty TNHH Dịch vụ và Phát triển Công nghệ Hachitech Solution",
+    "tag": "Hachitech"
+  },
+  {
+    "title": "Mr",
+    "name": "Bùi Hiếu",
+    "role": "CTO",
+    "organization": "Công ty TNHH Dịch vụ và Phát triển Công nghệ Hachitech Solution",
+    "tag": "Hachitech"
+  },
+  {
+    "title": "Mr",
+    "name": "Khang Phạm",
+    "role": "CEO",
+    "organization": "Công ty TNHH EcomElite Global",
+    "tag": "EcomElite"
+  },
+  {
+    "title": "Mr",
+    "name": "Vũ Văn Trinh",
+    "role": "",
+    "organization": "Công ty TNHH EcomElite Global",
+    "tag": "EcomElite"
+  },
+  {
+    "title": "Mr",
+    "name": "Thắng Trương",
+    "role": "CTO",
+    "organization": "Công ty TNHH EcomElite Global",
+    "tag": "EcomElite"
+  },
+  {
+    "title": "Mr",
+    "name": "Hoàng Thổ",
+    "role": "",
+    "organization": "Công ty Hoàng Dũng",
+    "tag": "hoangdung"
+  },
+  {
+    "title": "Mr",
+    "name": "Tiến",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Tùng Kirsty",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Thắng Biển",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Vi Anh Tú",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Đàm Bá Quyền",
+    "role": "CEO",
+    "organization": "Công ty Cổ phần Công nghệ Biva",
+    "tag": "Biva"
+  },
+  {
+    "title": "Mr",
+    "name": "Triệu Khương Duy",
+    "role": "",
+    "organization": "Công ty Cổ phần Công nghệ Biva",
+    "tag": "biva"
+  },
+  {
+    "title": "Prof. Dr.",
+    "name": "Phùng Trung Nghĩa",
+    "role": "Rector",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Dr.",
+    "name": "Nguyễn Văn Tảo",
+    "role": "President",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Dr.",
+    "name": "Đỗ Đình Cường",
+    "role": "Vice Rector",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Dr.",
+    "name": "Đinh Xuân Lâm",
+    "role": "Viện trưởng IAST",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Dr.",
+    "name": "Trần Văn Khánh",
+    "role": "Viện phó IAST",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Dr.",
+    "name": "Vũ Xuân Nam",
+    "role": "Trưởng khoa Kinh tế và Quản trị",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Dr.",
+    "name": "Quách Xuân Trưởng",
+    "role": "Trưởng khoa Công nghệ Thông tin",
+    "organization": "Trường Đại học Công nghệ Thông tin và Truyền thông Thái Nguyên",
+    "tag": "ICTU"
+  },
+  {
+    "title": "Mr",
+    "name": "La Văn Năm",
+    "role": "CEO",
+    "organization": "Công ty Gstar",
+    "tag": "Gstar"
+  },
+  {
+    "title": "Mr",
+    "name": "Lê Văn Bảo",
+    "role": "",
+    "organization": "Công ty GTE",
+    "tag": "GTE"
+  },
+  {
+    "title": "Mr",
+    "name": "Đàm Quang Hỷ",
+    "role": "",
+    "organization": "Công ty GTE",
+    "tag": "GTE"
+  },
+  {
+    "title": "Mr",
+    "name": "Lưu Thế Anh",
+    "role": "",
+    "organization": "Công ty GTE",
+    "tag": "GTE"
+  },
+  {
+    "title": "Mr",
+    "name": "Nguyễn Văn Việt",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Nguyễn Minh Đức",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Nguyễn Văn Phương",
+    "role": "",
+    "organization": "ST",
+    "tag": "ST"
+  },
+  {
+    "title": "Mr",
+    "name": "Nguyễn Anh Tú",
+    "role": "",
+    "organization": "Dino",
+    "tag": "Dino"
+  },
+  {
+    "title": "Mr",
+    "name": "Nguyễn Hoàng Hải",
+    "role": "",
+    "organization": "Dino",
+    "tag": "Dino"
+  },
+  {
+    "title": "Mr",
+    "name": "Đoàn Minh Bắc",
+    "role": "",
+    "organization": "SSE",
+    "tag": "SSE"
+  },
+  {
+    "title": "Mr",
+    "name": "Nguyễn Quang Thái",
+    "role": "",
+    "organization": "SSE",
+    "tag": "SSE"
+  },
+  {
+    "title": "Mr",
+    "name": "Le Trung Dung",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mrs",
+    "name": "Linh",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Quang Nguyên",
+    "role": "",
+    "organization": "",
+    "tag": ""
+  },
+  {
+    "title": "Mr",
+    "name": "Nhã",
+    "role": "",
+    "organization": "EXP",
+    "tag": "EXP"
+  },
+  {
+    "title": "Mr",
+    "name": "Việt",
+    "role": "",
+    "organization": "EXP",
+    "tag": "EXP"
+  }
+]
+
+
+
+
+
+

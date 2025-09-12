@@ -1,0 +1,291 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* Custom CSS Variables - Based on EXP Solution Brand */
+:root {
+  --exp-primary: #1976D2;        /* Professional Blue */
+  --exp-secondary: #1E88E5;      /* Light Blue */
+  --exp-accent: #FF9800;         /* Orange CTA */
+  --exp-success: #4CAF50;        /* Green */
+  --exp-warning: #FF9800;        /* Orange */
+  --exp-error: #F44336;          /* Red */
+  --exp-dark: #0D1421;           /* Dark Blue Background */
+  --exp-light: #FFFFFF;          /* White */
+  --exp-gray: #F5F5F5;           /* Light Gray */
+  --exp-text: #212121;           /* Dark Text */
+  --exp-text-light: #757575;     /* Light Text */
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #0D1421 0%, #1E3A8A 50%, #3B82F6 100%);
+  color: #f1f5f9;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+  color: #1e293b;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1f3a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #00bcd4, #3f51b5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #3f51b5, #e91e63);
+}
+
+/* EXP Logo Animation */
+@keyframes expGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(0, 188, 212, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(0, 188, 212, 0.8));
+  }
+}
+
+.exp-logo {
+  animation: expGlow 3s ease-in-out infinite;
+}
+
+/* Gradient Text - EXP Solution Brand */
+.gradient-text {
+  background: linear-gradient(135deg, var(--exp-primary), var(--exp-secondary), var(--exp-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass Morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button Styles - EXP Solution Brand */
+.btn-exp {
+  background: linear-gradient(135deg, var(--exp-primary), var(--exp-secondary));
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px 0 rgba(25, 118, 210, 0.3);
+}
+
+.btn-exp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(25, 118, 210, 0.4);
+  background: linear-gradient(135deg, var(--exp-secondary), var(--exp-primary));
+}
+
+.btn-exp:active {
+  transform: translateY(0);
+}
+
+.btn-exp::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-exp:hover::before {
+  left: 100%;
+}
+
+/* CTA Button - Orange style from EXP Solution */
+.btn-cta {
+  background: linear-gradient(135deg, var(--exp-accent), #FF5722);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px 0 rgba(255, 152, 0, 0.3);
+}
+
+.btn-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 152, 0, 0.4);
+  background: linear-gradient(135deg, #FF5722, var(--exp-accent));
+}
+
+/* Card Styles - EXP Solution Brand */
+.card-exp {
+  background: linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(30, 136, 229, 0.1) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(25, 118, 210, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(25, 118, 210, 0.2), 0 2px 4px -1px rgba(25, 118, 210, 0.1);
+}
+
+.dark .card-exp {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1), 0 2px 4px -1px rgba(99, 102, 241, 0.06);
+}
+
+.card-exp:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(25, 118, 210, 0.2);
+  border-color: rgba(25, 118, 210, 0.3);
+}
+
+/* Input Styles */
+.input-exp {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.input-exp:focus {
+  outline: none;
+  border-color: #00bcd4;
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+}
+
+.input-exp::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Select dropdown options */
+.input-exp option {
+  background: #1a1f3a !important;
+  color: white !important;
+  padding: 8px 12px;
+}
+
+.input-exp option:hover {
+  background: #00bcd4 !important;
+  color: white !important;
+}
+
+.input-exp option:checked {
+  background: #00bcd4 !important;
+  color: white !important;
+}
+
+/* Status Badges */
+.status-pending {
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  color: #000;
+}
+
+.status-accepted {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.status-declined {
+  background: linear-gradient(135deg, #dc3545, #e83e8c);
+  color: white;
+}
+
+.status-checked-in {
+  background: linear-gradient(135deg, #00bcd4, #3f51b5);
+  color: white;
+}
+
+/* Loading Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card-exp {
+    padding: 16px;
+  }
+  
+  .btn-exp {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .glass, .glass-dark {
+    background: white;
+    border: 1px solid #ddd;
+  }
+}
+
+

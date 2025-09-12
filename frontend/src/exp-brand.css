@@ -1,0 +1,386 @@
+/* EXP Solution Brand Styles */
+/* Based on analysis from https://expsolution.io/ */
+
+/* Brand Colors */
+.exp-primary { color: var(--exp-primary) !important; }
+.exp-secondary { color: var(--exp-secondary) !important; }
+.exp-accent { color: var(--exp-accent) !important; }
+.exp-success { color: var(--exp-success) !important; }
+.exp-warning { color: var(--exp-warning) !important; }
+.exp-error { color: var(--exp-error) !important; }
+
+/* Background Colors */
+.bg-exp-primary { background-color: var(--exp-primary) !important; }
+.bg-exp-secondary { background-color: var(--exp-secondary) !important; }
+.bg-exp-accent { background-color: var(--exp-accent) !important; }
+.bg-exp-dark { background-color: var(--exp-dark) !important; }
+.bg-exp-light { background-color: var(--exp-light) !important; }
+.bg-exp-gray { background-color: var(--exp-gray) !important; }
+
+/* Gradient Backgrounds */
+.bg-gradient-exp {
+  background: linear-gradient(135deg, var(--exp-primary), var(--exp-secondary));
+}
+
+.bg-gradient-exp-accent {
+  background: linear-gradient(135deg, var(--exp-accent), #FF5722);
+}
+
+.bg-gradient-exp-dark {
+  background: linear-gradient(135deg, var(--exp-dark), #1E3A8A, #3B82F6);
+}
+
+/* Professional Grid Layout - Inspired by EXP Solution */
+.exp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 24px;
+}
+
+.exp-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.exp-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* Professional Card Design */
+.exp-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(25, 118, 210, 0.1);
+  transition: all 0.3s ease;
+}
+
+.exp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.15);
+  border-color: rgba(25, 118, 210, 0.2);
+}
+
+/* Professional Header */
+.exp-header {
+  background: white;
+  border-bottom: 1px solid rgba(25, 118, 210, 0.1);
+  padding: 16px 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Professional Navigation */
+.exp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+  background: white;
+  border-bottom: 1px solid rgba(25, 118, 210, 0.1);
+}
+
+.exp-nav-logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--exp-primary);
+  text-decoration: none;
+}
+
+.exp-nav-menu {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.exp-nav-item {
+  color: var(--exp-text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.exp-nav-item:hover {
+  color: var(--exp-primary);
+}
+
+/* Professional Footer */
+.exp-footer {
+  background: var(--exp-dark);
+  color: white;
+  padding: 48px 24px 24px;
+  text-align: center;
+}
+
+.exp-footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+  text-align: left;
+}
+
+.exp-footer-section h3 {
+  color: var(--exp-secondary);
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.exp-footer-section p,
+.exp-footer-section a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  line-height: 1.6;
+}
+
+.exp-footer-section a:hover {
+  color: var(--exp-secondary);
+}
+
+/* Professional Buttons */
+.exp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+
+.exp-btn-primary {
+  background: var(--exp-primary);
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(25, 118, 210, 0.3);
+}
+
+.exp-btn-primary:hover {
+  background: var(--exp-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.4);
+}
+
+.exp-btn-cta {
+  background: var(--exp-accent);
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(255, 152, 0, 0.3);
+}
+
+.exp-btn-cta:hover {
+  background: #FF5722;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 152, 0, 0.4);
+}
+
+.exp-btn-outline {
+  background: transparent;
+  color: var(--exp-primary);
+  border: 2px solid var(--exp-primary);
+}
+
+.exp-btn-outline:hover {
+  background: var(--exp-primary);
+  color: white;
+}
+
+/* Professional Form Elements */
+.exp-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(25, 118, 210, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.exp-input:focus {
+  outline: none;
+  border-color: var(--exp-primary);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+.exp-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(25, 118, 210, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.exp-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(25, 118, 210, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Professional Status Badges */
+.exp-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.exp-badge-success {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--exp-success);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.exp-badge-warning {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--exp-warning);
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.exp-badge-error {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--exp-error);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.exp-badge-info {
+  background: rgba(25, 118, 210, 0.1);
+  color: var(--exp-primary);
+  border: 1px solid rgba(25, 118, 210, 0.2);
+}
+
+/* Professional Typography */
+.exp-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--exp-text);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.exp-subtitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--exp-text);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.exp-heading {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--exp-text);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.exp-text {
+  font-size: 16px;
+  color: var(--exp-text-light);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.exp-text-small {
+  font-size: 14px;
+  color: var(--exp-text-light);
+  line-height: 1.5;
+}
+
+/* Professional Spacing */
+.exp-section {
+  padding: 48px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.exp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Professional Animations */
+@keyframes expFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.exp-fade-in {
+  animation: expFadeIn 0.6s ease-out;
+}
+
+@keyframes expSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.exp-slide-in {
+  animation: expSlideIn 0.6s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .exp-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .exp-nav {
+    padding: 0 16px;
+  }
+  
+  .exp-nav-menu {
+    gap: 16px;
+  }
+  
+  .exp-section {
+    padding: 24px 16px;
+  }
+  
+  .exp-container {
+    padding: 0 16px;
+  }
+  
+  .exp-title {
+    font-size: 24px;
+  }
+  
+  .exp-subtitle {
+    font-size: 20px;
+  }
+}
