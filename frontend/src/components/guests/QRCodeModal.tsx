@@ -4,12 +4,15 @@ import { X, Download, QrCode } from 'lucide-react';
 interface QRCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  guest: any;
+  guest: any | null;
 }
 
 const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
+
+  // Debug logging
+  console.log('QRCodeModal render:', { isOpen, guest: guest?.name });
 
   const generateQRCode = useCallback(async () => {
     if (!guest) return;
@@ -50,6 +53,8 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
   useEffect(() => {
     if (isOpen && guest) {
       generateQRCode();
+      // Scroll to top when modal opens
+      window.scrollTo(0, 0);
     }
   }, [isOpen, guest, generateQRCode]);
 
@@ -65,9 +70,13 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center justify-between mb-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-start justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" onClick={onClose}></div>
+
+        <div className="inline-block align-top bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-top sm:max-w-md sm:w-full" style={{marginTop: '20px'}}>
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center">
             <QrCode className="mr-2" size={20} />
             QR Code - {guest?.name}
@@ -110,21 +119,23 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
           )}
         </div>
 
-        <div className="flex justify-center mt-6 space-x-3">
-          <button
-            onClick={downloadQRCode}
-            disabled={!qrCodeUrl}
-            className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            <Download size={16} className="mr-2" />
-            Tải xuống
-          </button>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Đóng
-          </button>
+            <div className="flex justify-center mt-6 space-x-3">
+              <button
+                onClick={downloadQRCode}
+                disabled={!qrCodeUrl}
+                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              >
+                <Download size={16} className="mr-2" />
+                Tải xuống
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

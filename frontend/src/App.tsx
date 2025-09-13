@@ -4,7 +4,10 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/layout/Layout';
+import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import Guests from './pages/Guests';
 import Events from './pages/Events';
@@ -14,7 +17,6 @@ import Settings from './pages/Settings';
 import Invitations from './pages/Invitations';
 import CheckIn from './pages/CheckIn';
 import Invitation from './pages/Invitation';
-import TestQR from './pages/TestQR';
 import './App.css';
 import './exp-brand.css';
 
@@ -33,22 +35,75 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LanguageProvider>
-          <Router>
-          <div className="App">
-            <Layout>
+          <AuthProvider>
+            <Router>
+            <div className="App">
               <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/guests" element={<Guests />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/invitations" element={<Invitations />} />
-                <Route path="/scanner" element={<QRScanner />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/settings" element={<Settings />} />
-              <Route path="/checkin" element={<CheckIn />} />
-              <Route path="/invitation/:guestId" element={<Invitation />} />
-              <Route path="/test-qr" element={<TestQR />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/guests" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Guests />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/events" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Events />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/invitations" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Invitations />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/scanner" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <QRScanner />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/reports" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Reports />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Settings />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/checkin" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <CheckIn />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/invitation/:guestId" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <Invitation />
+                    </Layout>
+                  </ProtectedRoute>
+                } />
               </Routes>
-            </Layout>
             <Toaster
               position="top-right"
               toastOptions={{
@@ -60,8 +115,9 @@ function App() {
                 },
               }}
             />
-          </div>
-          </Router>
+            </div>
+            </Router>
+          </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>

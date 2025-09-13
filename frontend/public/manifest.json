@@ -1,6 +1,6 @@
 {
-  "short_name": "Guest Management",
-  "name": "Hệ thống Quản lý Khách mời – Lễ kỷ niệm 15 năm",
+  "short_name": "EXP Guest Management",
+  "name": "EXP Technology - Guest Management System",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,13 +20,9 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#00bcd4",
-  "background_color": "#0a0e27"
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
-
-
-
-
 
 
 

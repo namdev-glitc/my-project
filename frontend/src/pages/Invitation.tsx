@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { Calendar, MapPin, CheckCircle, XCircle, QrCode, Download, Share2, Mail, Phone, ExternalLink } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { getGuest, getEvent, updateGuestRSVP } from '../services/api';
+import ExpLogoImage from '../components/ExpLogoImage';
 
 interface Guest {
   id: number;
@@ -114,10 +115,8 @@ const Invitation: React.FC = () => {
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block p-4 bg-white/10 backdrop-blur-sm rounded-full mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto">
-              <span className="text-2xl font-bold text-white">15</span>
-            </div>
+          <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ExpLogoImage size="sm" showText={false} />
           </div>
           <h1 className="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             Thiệp mời tham dự

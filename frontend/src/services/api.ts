@@ -24,15 +24,53 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor with automatic token refresh
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (refreshToken) {
+        try {
+          const response = await fetch('http://localhost:8000/api/auth/refresh', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.access_token);
+            
+            // Retry the original request with new token
+            originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
+            return api(originalRequest);
+          } else {
+            // Refresh failed, redirect to login
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/login';
+          }
+        } catch (refreshError) {
+          // Refresh failed, redirect to login
+          localStorage.removeItem('token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/login';
+        }
+      } else {
+        // No refresh token, redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
+      }
     }
+    
     return Promise.reject(error);
   }
 );

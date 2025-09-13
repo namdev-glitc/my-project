@@ -11,6 +11,7 @@ import GuestTable from '../components/guests/GuestTable';
 import GuestModal from '../components/guests/GuestModal';
 import ImportModal from '../components/guests/ImportModal';
 import SearchFilter from '../components/guests/SearchFilter';
+import AnimatedCounter from '../components/AnimatedCounter';
 import toast from 'react-hot-toast';
 
 const Guests: React.FC = () => {
@@ -144,12 +145,18 @@ const Guests: React.FC = () => {
   const allSelected = filteredGuests.length > 0 && selectedIds.length === filteredGuests.map((g: any) => g.id).length;
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-purple-900/5 to-orange-900/10 pointer-events-none"></div>
+      <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-orange-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="relative z-10 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-blue-600">Quản lý Khách mời</h1>
-          <p className="text-blue-500 mt-2">
+          <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">Quản lý Khách mời</h1>
+          <p className="text-gray-300 mt-2 text-lg">
             Quản lý danh sách khách mời và RSVP
           </p>
         </div>
@@ -157,38 +164,38 @@ const Guests: React.FC = () => {
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="btn-exp flex items-center space-x-2"
+              className="group relative overflow-hidden bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-red-500/25 flex items-center space-x-2"
             >
-              <Trash2 size={20} />
+              <Trash2 size={20} className="group-hover:scale-110 transition-transform duration-300" />
               <span>{allSelected ? 'Xóa tất cả' : `Xóa đã chọn (${selectedIds.length})`}</span>
             </button>
           )}
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="btn-exp flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-green-500/25 flex items-center space-x-2"
           >
-            <Upload size={20} />
+            <Upload size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>Import CSV</span>
           </button>
           <button 
             onClick={handleExportExcel}
-            className="btn-exp flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 flex items-center space-x-2"
           >
-            <Download size={20} />
+            <Download size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>Xuất Excel</span>
           </button>
           <button
             onClick={handleAddNew}
-            className="btn-exp flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-orange-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-orange-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-orange-500/25 flex items-center space-x-2"
           >
-            <Plus size={20} />
+            <Plus size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>Thêm khách mời</span>
           </button>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="card-exp">
+      <div className="relative z-10 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
         <SearchFilter
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -198,35 +205,82 @@ const Guests: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card-exp text-center">
-          <div className="text-2xl font-bold text-exp-primary">
-            {filteredGuests.length}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Total Guests */}
+        <div className="group relative overflow-hidden backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-4xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+              <AnimatedCounter value={filteredGuests.length} />
+            </div>
+            <div className="text-gray-300 text-sm font-medium mb-3">Tổng khách mời</div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style={{width: '100%'}}></div>
+            </div>
           </div>
-          <div className="text-blue-400 text-sm">Tổng khách mời</div>
+          <div className="absolute inset-0 -top-2 -left-2 w-8 h-8 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-300"></div>
         </div>
-        <div className="card-exp text-center">
-          <div className="text-2xl font-bold text-green-400">
-            {filteredGuests.filter((g: any) => g.rsvp_status === 'accepted').length}
+
+        {/* Accepted Guests */}
+        <div className="group relative overflow-hidden backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-500/20 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-4xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+              <AnimatedCounter value={filteredGuests.filter((g: any) => g.rsvp_status === 'accepted').length} />
+            </div>
+            <div className="text-gray-300 text-sm font-medium mb-3">Đã chấp nhận</div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full" 
+                   style={{width: `${filteredGuests.length > 0 ? (filteredGuests.filter((g: any) => g.rsvp_status === 'accepted').length / filteredGuests.length) * 100 : 0}%`}}></div>
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {filteredGuests.length > 0 ? Math.round((filteredGuests.filter((g: any) => g.rsvp_status === 'accepted').length / filteredGuests.length) * 100) : 0}%
+            </div>
           </div>
-          <div className="text-blue-400 text-sm">Đã chấp nhận</div>
+          <div className="absolute inset-0 -top-2 -left-2 w-8 h-8 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-300"></div>
         </div>
-        <div className="card-exp text-center">
-          <div className="text-2xl font-bold text-yellow-400">
-            {filteredGuests.filter((g: any) => g.rsvp_status === 'pending').length}
+
+        {/* Pending Guests */}
+        <div className="group relative overflow-hidden backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-yellow-500/20 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-4xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+              <AnimatedCounter value={filteredGuests.filter((g: any) => g.rsvp_status === 'pending').length} />
+            </div>
+            <div className="text-gray-300 text-sm font-medium mb-3">Chờ phản hồi</div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="bg-gradient-to-r from-yellow-500 to-orange-500 h-2 rounded-full" 
+                   style={{width: `${filteredGuests.length > 0 ? (filteredGuests.filter((g: any) => g.rsvp_status === 'pending').length / filteredGuests.length) * 100 : 0}%`}}></div>
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {filteredGuests.length > 0 ? Math.round((filteredGuests.filter((g: any) => g.rsvp_status === 'pending').length / filteredGuests.length) * 100) : 0}%
+            </div>
           </div>
-          <div className="text-blue-400 text-sm">Chờ phản hồi</div>
+          <div className="absolute inset-0 -top-2 -left-2 w-8 h-8 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-300"></div>
         </div>
-        <div className="card-exp text-center">
-          <div className="text-2xl font-bold text-blue-400">
-            {filteredGuests.filter((g: any) => g.checked_in).length}
+
+        {/* Checked-in Guests */}
+        <div className="group relative overflow-hidden backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-4xl font-bold text-white mb-2 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+              <AnimatedCounter value={filteredGuests.filter((g: any) => g.checked_in).length} />
+            </div>
+            <div className="text-gray-300 text-sm font-medium mb-3">Đã check-in</div>
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full" 
+                   style={{width: `${filteredGuests.length > 0 ? (filteredGuests.filter((g: any) => g.checked_in).length / filteredGuests.length) * 100 : 0}%`}}></div>
+            </div>
+            <div className="text-xs text-gray-400 mt-1">
+              {filteredGuests.length > 0 ? Math.round((filteredGuests.filter((g: any) => g.checked_in).length / filteredGuests.length) * 100) : 0}%
+            </div>
           </div>
-          <div className="text-blue-400 text-sm">Đã check-in</div>
+          <div className="absolute inset-0 -top-2 -left-2 w-8 h-8 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-300"></div>
         </div>
       </div>
 
       {/* Guest Table */}
-      <div className="card-exp">
+      <div className="relative z-10 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-all duration-300">
         <GuestTable
           guests={filteredGuests}
           loading={isLoading}

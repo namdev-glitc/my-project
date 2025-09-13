@@ -108,36 +108,42 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-purple-900/5 to-orange-900/10 pointer-events-none"></div>
+      <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-orange-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="relative z-10 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white dark:text-indigo-800">{t('dashboard.title')}</h1>
-          <p className="text-gray-400 dark:text-indigo-600 mt-2">
+          <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">{t('dashboard.title')}</h1>
+          <p className="text-gray-300 mt-2 text-lg">
             {t('dashboard.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
           <button 
             onClick={() => window.location.reload()}
-            className="btn-exp flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 flex items-center space-x-2"
             title="Làm mới trang"
           >
-            <RefreshCw size={20} />
+            <RefreshCw size={20} className="group-hover:rotate-180 transition-transform duration-300" />
             <span>{t('dashboard.refresh')}</span>
           </button>
           <button 
             onClick={handleQRScanner}
-            className="btn-exp flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-orange-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-orange-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-orange-500/25 flex items-center space-x-2"
           >
-            <QrCode size={20} />
+            <QrCode size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>{t('dashboard.qr_scanner')}</span>
           </button>
           <button 
             onClick={handleExportReport}
-            className="btn-exp flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-green-500/25 flex items-center space-x-2"
           >
-            <Download size={20} />
+            <Download size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>{t('dashboard.export_report')}</span>
           </button>
         </div>
@@ -191,7 +197,7 @@ const Dashboard: React.FC = () => {
       })()}
 
       {/* Stats Grid - 4 cards in a row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <StatsCard
             key={index}
@@ -207,7 +213,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Events List */}
         <div className="lg:col-span-2">
           <EventsList />

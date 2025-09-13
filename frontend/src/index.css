@@ -2,8 +2,8 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+/* Google Fonts from mini_Rar */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 /* Custom CSS Variables - Based on EXP Solution Brand */
 :root {
@@ -18,6 +18,28 @@
   --exp-gray: #F5F5F5;           /* Light Gray */
   --exp-text: #212121;           /* Dark Text */
   --exp-text-light: #757575;     /* Light Text */
+  
+  /* EXP Solution Brand Colors from expsolution.io */
+  --brand: 224.3 76.3% 48%;     /* Primary Brand Blue */
+  --brand-2: 268 83% 65%;       /* Secondary Purple */
+  --brand-3: 190 95% 39%;       /* Accent Cyan */
+  --background: 222.2 84% 4.9%; /* Dark Background */
+  --foreground: 210 40% 98%;    /* Light Text */
+  --card: 222.2 84% 4.9%;       /* Card Background */
+  --card-foreground: 210 40% 98%; /* Card Text */
+  --border: 217.2 32.6% 17.5%;  /* Border Color */
+  --input: 217.2 32.6% 17.5%;   /* Input Background */
+  --primary: 210 40% 98%;       /* Primary Text */
+  --primary-foreground: 222.2 47.4% 11.2%; /* Primary Background */
+  --secondary: 217.2 32.6% 17.5%; /* Secondary Background */
+  --secondary-foreground: 210 40% 98%; /* Secondary Text */
+  --muted: 217.2 32.6% 17.5%;   /* Muted Background */
+  --muted-foreground: 215 20.2% 65.1%; /* Muted Text */
+  --accent: 217.2 32.6% 17.5%;  /* Accent Background */
+  --accent-foreground: 210 40% 98%; /* Accent Text */
+  --destructive: 0 62.8% 30.6%; /* Destructive Color */
+  --destructive-foreground: 210 40% 98%; /* Destructive Text */
+  --ring: 212.7 26.8% 83.9%;    /* Focus Ring */
 }
 
 /* Base Styles */
@@ -27,17 +49,34 @@
   box-sizing: border-box;
 }
 
+/* Font family for all elements */
+html, :host {
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+}
+
+/* Monospace font for code elements */
+code, kbd, samp, pre {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  font-size: 1em;
+}
+
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #0D1421 0%, #1E3A8A 50%, #3B82F6 100%);
-  color: #f1f5f9;
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 .dark body {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-  color: #1e293b;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 /* Custom Scrollbar */
@@ -75,6 +114,14 @@ body {
 /* Gradient Text - EXP Solution Brand */
 .gradient-text {
   background: linear-gradient(135deg, var(--exp-primary), var(--exp-secondary), var(--exp-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* EXP Solution Brand Gradient */
+.brand-gradient {
+  background: linear-gradient(135deg, hsl(var(--brand)), hsl(var(--brand-2)) 60%, hsl(var(--brand-3)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -263,12 +310,37 @@ body {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Font utility classes from mini_Rar */
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.leading-none { line-height: 1; }
+.leading-tight { line-height: 1.25; }
+.leading-relaxed { line-height: 1.625; }
+
+.tracking-tight { letter-spacing: -.025em; }
+.tracking-widest { letter-spacing: .1em; }
+
+.uppercase { text-transform: uppercase; }
+.capitalize { text-transform: capitalize; }
+.italic { font-style: italic; }
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .card-exp {
     padding: 16px;
   }
-  
+
   .btn-exp {
     padding: 10px 20px;
     font-size: 14px;
@@ -287,5 +359,6 @@ body {
     border: 1px solid #ddd;
   }
 }
+
 
 

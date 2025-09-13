@@ -10,7 +10,7 @@ interface InvitationLinkModalProps {
     name: string;
     email?: string;
     phone?: string;
-  };
+  } | null;
   event: {
     id: number;
     name: string;
@@ -26,6 +26,14 @@ const InvitationLinkModal: React.FC<InvitationLinkModalProps> = ({
   event
 }) => {
   const [copied, setCopied] = useState(false);
+  
+  // Handle modal open/close effects
+  React.useEffect(() => {
+    if (isOpen) {
+      // Scroll to top when modal opens
+      window.scrollTo(0, 0);
+    }
+  }, [isOpen]);
   
   // Kiểm tra guest và event có tồn tại không
   if (!guest || !event) {
@@ -63,8 +71,11 @@ const InvitationLinkModal: React.FC<InvitationLinkModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex items-start justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
+
+        <div className="inline-block align-top bg-white rounded-3xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-top sm:max-w-2xl sm:w-full" style={{marginTop: '20px'}}>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-t-3xl">
           <div className="flex justify-between items-center">
@@ -196,15 +207,16 @@ const InvitationLinkModal: React.FC<InvitationLinkModalProps> = ({
 
         </div>
 
-        {/* Footer */}
-        <div className="bg-gray-50 px-8 py-6 rounded-b-3xl">
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 font-semibold"
-            >
-              Đóng
-            </button>
+          {/* Footer */}
+          <div className="bg-gray-50 px-8 py-6 rounded-b-3xl">
+            <div className="flex justify-end">
+              <button
+                onClick={onClose}
+                className="px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 font-semibold"
+              >
+                Đóng
+              </button>
+            </div>
           </div>
         </div>
       </div>

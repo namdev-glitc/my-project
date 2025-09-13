@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from pydantic import BaseModel
 from ..database import get_db
 from ..models.guest import Guest
 from ..models.event import Event
@@ -8,13 +9,31 @@ from ..services.invitation_service import InvitationService
 from ..schemas.guest import GuestResponse
 import os
 
+# Pydantic models for request data
+class GenerateInvitationRequest(BaseModel):
+    template: Optional[str] = "elegant"
+    event_id: Optional[int] = None
+
+class GenerateBulkRequest(BaseModel):
+    guest_ids: List[int]
+    template: Optional[str] = "elegant"
+    event_id: Optional[int] = None
+
+class SendEmailRequest(BaseModel):
+    template: Optional[str] = "elegant"
+
+class PreviewRequest(BaseModel):
+    template: str
+    event_id: int
+    customization: dict = {}
+
 router = APIRouter(prefix="/invitations", tags=["invitations"])
 
 # Initialize service
 invitation_service = InvitationService()
 
-@router.get("/generate/{guest_id}")
-def generate_invitation(guest_id: int, db: Session = Depends(get_db)):
+@router.post("/generate/{guest_id}")
+def generate_invitation(guest_id: int, request_data: GenerateInvitationRequest, db: Session = Depends(get_db)):
     """
     Tạo thiệp mời cho khách mời
     """
@@ -80,9 +99,9 @@ def generate_invitation(guest_id: int, db: Session = Depends(get_db)):
         "event": event_dict
     }
 
-@router.get("/generate-all")
+@router.post("/generate-all")
 def generate_all_invitations(
-    event_id: Optional[int] = Query(None),
+    request_data: GenerateInvitationRequest,
     db: Session = Depends(get_db)
 ):
     """
@@ -90,6 +109,9 @@ def generate_all_invitations(
     """
     # Lấy danh sách khách mời
     query = db.query(Guest)
+    
+    # Extract event_id from request_data if provided
+    event_id = request_data.event_id
     if event_id:
         query = query.filter(Guest.event_id == event_id)
     
@@ -147,6 +169,76 @@ def generate_all_invitations(
     
     return {
         "message": f"Đã tạo {len(invitations)} thiệp mời",
+        "invitations": invitations,
+        "event": event_dict
+    }
+
+@router.post("/generate-bulk")
+def generate_bulk_invitations(
+    request_data: GenerateBulkRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Tạo thiệp mời cho nhiều khách mời được chọn
+    """
+    if not request_data.guest_ids:
+        raise HTTPException(status_code=400, detail="Danh sách khách mời không được để trống")
+    
+    # Lấy danh sách khách mời theo IDs
+    guests = db.query(Guest).filter(Guest.id.in_(request_data.guest_ids)).all()
+    
+    if not guests:
+        raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
+    
+    # Lấy thông tin sự kiện từ khách mời đầu tiên
+    event = db.query(Event).filter(Event.id == guests[0].event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Không tìm thấy sự kiện")
+    
+    event_dict = {
+        'id': event.id,
+        'name': event.name,
+        'event_date': event.event_date.isoformat(),
+        'location': getattr(event, 'location', ''),
+        'address': getattr(event, 'address', ''),
+        'agenda': getattr(event, 'agenda', ''),
+        'description': getattr(event, 'description', '')
+    }
+    
+    invitations = []
+    
+    for guest in guests:
+        guest_dict = {
+            'id': guest.id,
+            'title': guest.title,
+            'name': guest.name,
+            'role': guest.role,
+            'organization': guest.organization,
+            'tag': guest.tag,
+            'email': guest.email,
+            'phone': guest.phone
+        }
+        
+        # Tạo dữ liệu thiệp mời
+        invitation_data = invitation_service.generate_invitation_data(guest_dict, event_dict)
+        
+        # Tạo HTML thiệp mời
+        html_content = invitation_service.generate_html_invitation(invitation_data)
+        
+        # Lưu file HTML
+        filename = f"invite_{invitation_data['meta']['invitation_id']}.html"
+        filepath = invitation_service.save_invitation_html(invitation_data, filename)
+        
+        invitations.append({
+            "guest_id": guest.id,
+            "guest_name": guest.name,
+            "invitation_id": invitation_data['meta']['invitation_id'],
+            "file_path": filepath,
+            "invitation_data": invitation_data
+        })
+    
+    return {
+        "message": f"Đã tạo {len(invitations)} thiệp mời cho {len(request_data.guest_ids)} khách mời",
         "invitations": invitations,
         "event": event_dict
     }
@@ -237,6 +329,60 @@ def download_invitation(guest_id: int, db: Session = Depends(get_db)):
         "filename": filename,
         "invitation_id": invitation_data['meta']['invitation_id'],
         "download_url": f"/static/invitations/{filename}"
+    }
+
+@router.post("/send-email/{guest_id}")
+def send_invitation_email(guest_id: int, request_data: SendEmailRequest, db: Session = Depends(get_db)):
+    """
+    Gửi email thiệp mời cho khách mời
+    """
+    # Lấy thông tin khách mời
+    guest = db.query(Guest).filter(Guest.id == guest_id).first()
+    if not guest:
+        raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
+    
+    # Lấy thông tin sự kiện
+    event = db.query(Event).filter(Event.id == guest.event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Không tìm thấy sự kiện")
+    
+    guest_dict = {
+        'id': guest.id,
+        'title': guest.title,
+        'name': guest.name,
+        'role': guest.role,
+        'organization': guest.organization,
+        'tag': guest.tag,
+        'email': guest.email,
+        'phone': guest.phone
+    }
+    
+    event_dict = {
+        'id': event.id,
+        'name': event.name,
+        'event_date': event.event_date.isoformat(),
+        'location': getattr(event, 'location', ''),
+        'address': getattr(event, 'address', ''),
+        'agenda': getattr(event, 'agenda', ''),
+        'description': getattr(event, 'description', '')
+    }
+    
+    # Tạo dữ liệu thiệp mời
+    invitation_data = invitation_service.generate_invitation_data(guest_dict, event_dict)
+    
+    # Tạo và lưu file HTML
+    filename = f"invite_{invitation_data['meta']['invitation_id']}.html"
+    filepath = invitation_service.save_invitation_html(invitation_data, filename)
+    
+    # TODO: Implement actual email sending logic here
+    # For now, just return success message
+    
+    return {
+        "message": f"Đã gửi email thiệp mời cho {guest.name}",
+        "email": guest.email,
+        "invitation_id": invitation_data['meta']['invitation_id'],
+        "filename": filename,
+        "file_path": filepath
     }
 
 @router.get("/list")
@@ -345,7 +491,60 @@ def get_invitation_template():
         }
     }
 
-
-
+@router.post("/preview")
+async def preview_template(
+    request_data: PreviewRequest,
+    db: Session = Depends(get_db)
+):
+    """Preview template with sample data"""
+    try:
+        # Get event info
+        event = db.query(Event).filter(Event.id == request_data.event_id).first()
+        if not event:
+            raise HTTPException(status_code=404, detail="Event not found")
+        
+        # Create sample guest data for preview
+        sample_guest = {
+            "id": 0,
+            "name": "Nguyễn Văn Mẫu",
+            "email": "mau@example.com",
+            "phone": "0123456789",
+            "event_id": request_data.event_id,
+            "rsvp_status": "pending"
+        }
+        
+        # Create event data
+        event_dict = {
+            "id": event.id,
+            "name": event.name,
+            "event_date": event.event_date.isoformat() if event.event_date else None,
+            "date": event.event_date.isoformat() if event.event_date else None,
+            "time": None,  # Event model doesn't have time field
+            "location": event.location,
+            "description": event.description
+        }
+        
+        # Generate invitation data
+        invitation_data = invitation_service.generate_invitation_data(sample_guest, event_dict)
+        
+        # Apply customization if provided
+        if request_data.customization:
+            if 'primaryColor' in request_data.customization:
+                invitation_data['branding']['primary_color'] = request_data.customization['primaryColor']
+            if 'accentColor' in request_data.customization:
+                invitation_data['branding']['accent_color'] = request_data.customization['accentColor']
+        
+        # Generate HTML with template type
+        html_content = invitation_service.generate_html_invitation(invitation_data, request_data.template)
+        
+        return {
+            "html_content": html_content,
+            "invitation_data": invitation_data,
+            "template": request_data.template,
+            "customization": request_data.customization
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 

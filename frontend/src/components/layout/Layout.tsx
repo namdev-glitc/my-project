@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import ThemeToggle from '../ThemeToggle';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import ExpLogoImage from '../ExpLogoImage';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,6 +23,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
@@ -54,14 +57,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-700">
           {/* EXP Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-exp-gradient rounded-full flex items-center justify-center exp-logo">
-              <span className="text-white font-bold text-lg">EXP</span>
-            </div>
-            <div>
-              <h1 className="text-white font-bold text-lg">EXP</h1>
-              <p className="text-gray-400 dark:text-indigo-200 text-xs">{t('system.techno_logy')}</p>
-            </div>
+          <div className="flex flex-col items-center">
+            <ExpLogoImage size="xs" showText={true} />
+            <p className="text-gray-400 text-xs mt-1">Company Limited</p>
           </div>
           
           {/* Close button for mobile */}
@@ -89,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                     }`}
                   >
-                    <Icon size={20} className="mr-3" />
+                    <Icon size={20} />
                     {item.name}
                   </Link>
                 </li>
@@ -101,14 +99,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* User info */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-exp-gradient rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+            <div className="w-8 h-8 bg-black border border-white rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm">
+                {user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'A'}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">{t('system.admin')}</p>
-              <p className="text-gray-400 text-xs truncate">admin@exp-solution.io</p>
+              <p className="text-white text-sm font-medium truncate">
+                {user?.full_name || user?.username || 'Admin'}
+              </p>
+              <p className="text-gray-400 text-xs truncate">
+                {user?.email || 'admin@exp-solution.io'}
+              </p>
             </div>
-            <button className="text-gray-400 hover:text-white">
+            <button 
+              onClick={logout}
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Đăng xuất"
+            >
               <LogOut size={16} />
             </button>
           </div>

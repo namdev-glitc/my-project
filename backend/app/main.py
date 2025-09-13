@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
 from .database import engine, Base
-from .routes import guests, events, invitations
+from .routes import guests, events, invitations, auth
 
 # Tạo thư mục static
 os.makedirs("static", exist_ok=True)
@@ -34,6 +34,7 @@ app.mount("/qr_images", StaticFiles(directory="qr_images"), name="qr_images")
 app.mount("/invitations", StaticFiles(directory="templates/invitations"), name="invitations")
 
 # Include routers
+app.include_router(auth.router, prefix="/api")
 app.include_router(guests.router, prefix="/api")
 app.include_router(events.router, prefix="/api")
 app.include_router(invitations.router, prefix="/api")
@@ -133,6 +134,8 @@ async def startup_event():
                             tag=cleaned_guest.get('tag'),
                             email=cleaned_guest.get('email'),
                             phone=cleaned_guest.get('phone'),
+                            rsvp_status=cleaned_guest.get('rsvp_status', 'pending'),
+                            checked_in=cleaned_guest.get('checked_in', False),
                             event_id=event.id
                         )
                         

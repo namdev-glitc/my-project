@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from typing import Dict, Any
-from jinja2 import Template
+from jinja2 import Template, Environment
 import qrcode
 from io import BytesIO
 import base64
@@ -40,7 +40,7 @@ class InvitationService:
                 "title": event['name'],
                 "subtitle": "Lễ kỷ niệm 15 năm thành lập",
                 "host_org": "EXP Technology Company Limited",
-                "datetime": event['event_date'],
+                "datetime": event.get('event_date', event.get('date')),
                 "timezone": "Asia/Ho_Chi_Minh",
                 "venue": {
                     "name": event.get('location', ''),
@@ -153,11 +153,55 @@ class InvitationService:
         except:
             return "2025-09-30"
     
-    def generate_html_invitation(self, invitation_data: Dict[str, Any]) -> str:
+    def generate_html_invitation(self, invitation_data: Dict[str, Any], template_type: str = "elegant") -> str:
         """
-        Tạo HTML thiệp mời từ dữ liệu
+        Tạo HTML thiệp mời từ dữ liệu với template khác nhau
         """
-        template_html = """
+        # Chọn template dựa trên template_type
+        if template_type == "elegant":
+            template_html = self._get_elegant_template()
+        elif template_type == "modern":
+            template_html = self._get_modern_template()
+        elif template_type == "classic":
+            template_html = self._get_classic_template()
+        elif template_type == "festive":
+            template_html = self._get_festive_template()
+        else:
+            template_html = self._get_elegant_template()
+        
+        # Render template với Jinja2
+        env = Environment()
+        
+        # Register custom filters
+        def format_datetime(value):
+            if not value:
+                return ""
+            try:
+                dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+                return dt.strftime("%d/%m/%Y lúc %H:%M")
+            except:
+                return str(value)
+        
+        def format_date(value):
+            if not value:
+                return ""
+            try:
+                dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+                return dt.strftime("%d/%m/%Y")
+            except:
+                return str(value)
+        
+        env.filters['format_datetime'] = format_datetime
+        env.filters['format_date'] = format_date
+        
+        template = env.from_string(template_html)
+        return template.render(invitation_data=invitation_data)
+    
+    def _get_elegant_template(self) -> str:
+        """
+        Template thanh lịch - Thiết kế sang trọng
+        """
+        return """
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -545,28 +589,867 @@ class InvitationService:
 </body>
 </html>
         """
+    
+    def _get_modern_template(self) -> str:
+        """
+        Template hiện đại - Phong cách trẻ trung
+        """
+        return """
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ invitation_data.event.title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        template = Template(template_html)
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(45deg, #2D3748 0%, #4299E1 50%, #38B2AC 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
         
-        # Custom filters
-        def format_datetime(dt_str):
-            try:
-                dt = datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
-                return dt.strftime('%H:%M, %d/%m/%Y')
-            except:
-                return dt_str
+        .invitation-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            position: relative;
+        }
         
-        def format_date(dt_str):
-            try:
-                dt = datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
-                return dt.strftime('%d/%m/%Y')
-            except:
-                return dt_str
+        .header {
+            background: linear-gradient(135deg, #2D3748 0%, #4299E1 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
         
-        template.globals['format_datetime'] = format_datetime
-        template.globals['format_date'] = format_date
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #38B2AC, #4299E1);
+            border-radius: 20px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
+            position: relative;
+            z-index: 1;
+            transform: rotate(-5deg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
         
-        return template.render(invitation_data=invitation_data)
+        .event-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -1px;
+        }
+        
+        .event-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 50px 30px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            color: #2D3748;
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 16px;
+            padding: 25px;
+            border-left: 4px solid #4299E1;
+            transition: transform 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .info-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2D3748;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .program {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .program h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .program-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .program-item:last-child {
+            border-bottom: none;
+        }
+        
+        .program-time {
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 80px;
+        }
+        
+        .program-activity {
+            flex: 1;
+            margin-left: 20px;
+            font-size: 16px;
+        }
+        
+        .rsvp-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .rsvp-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4299E1 0%, #38B2AC 100%);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.3);
+        }
+        
+        .rsvp-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(66, 153, 225, 0.4);
+        }
+        
+        .qr-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 20px;
+        }
+        
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            background: #2D3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer a {
+            color: #4299E1;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="invitation-container">
+        <div class="header">
+            <div class="logo">EXP</div>
+            <h1 class="event-title">{{ invitation_data.event.title }}</h1>
+            <p class="event-subtitle">{{ invitation_data.event.subtitle }}</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Xin chào {{ invitation_data.guest.title }} {{ invitation_data.guest.name }}! 🚀
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-title">📅 Thời gian</div>
+                    <div class="info-value">{{ invitation_data.event.datetime | format_datetime }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">📍 Địa điểm</div>
+                    <div class="info-value">{{ invitation_data.event.venue.name }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">🏢 Tổ chức</div>
+                    <div class="info-value">{{ invitation_data.event.host_org }}</div>
+                </div>
+            </div>
+            
+            <div class="program">
+                <h3>🎯 Chương trình</h3>
+                {% for item in invitation_data.event.program_outline %}
+                <div class="program-item">
+                    <div class="program-time">{{ item.time }}</div>
+                    <div class="program-activity">{{ item.item }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="rsvp-section">
+                <a href="{{ invitation_data.rsvp.rsvp_url }}" class="rsvp-button">
+                    ✨ Xác nhận tham gia
+                </a>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    Hạn chót: {{ invitation_data.rsvp.deadline | format_date }}
+                </p>
+            </div>
+            
+            <div class="qr-section">
+                <h3 style="color: #2D3748; margin-bottom: 20px;">📱 QR Code Check-in</h3>
+                <img src="{{ invitation_data.qr_code }}" alt="QR Code" class="qr-code">
+                <p style="color: #666; font-size: 14px;">
+                    Quét mã QR để check-in nhanh chóng
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ invitation_data.event.host_org }}</strong></p>
+            <p>Thiệp mời ID: {{ invitation_data.meta.invitation_id }}</p>
+            <p>Tạo ngày: {{ invitation_data.meta.created_at | format_date }}</p>
+            <p>Liên hệ: <a href="mailto:contact@exp-solution.io">contact@exp-solution.io</a></p>
+        </div>
+    </div>
+</body>
+</html>
+        """
+    
+    def _get_classic_template(self) -> str:
+        """
+        Template cổ điển - Truyền thống
+        """
+        return """
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ invitation_data.event.title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Times New Roman', serif;
+            background: #1A202C;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .invitation-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 0 0 2px #718096, 0 0 0 4px #1A202C;
+            position: relative;
+        }
+        
+        .header {
+            background: #1A202C;
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border: 3px solid #718096;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #1A202C;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .event-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 2px;
+        }
+        
+        .event-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            font-style: italic;
+        }
+        
+        .content {
+            padding: 50px 40px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            color: #2D3748;
+            margin-bottom: 40px;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .info-section {
+            margin-bottom: 40px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1A202C;
+            min-width: 120px;
+            font-size: 16px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #4a5568;
+            flex: 1;
+        }
+        
+        .program {
+            background: #f7fafc;
+            border: 2px solid #718096;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .program h3 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #1A202C;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .program-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #cbd5e0;
+        }
+        
+        .program-item:last-child {
+            border-bottom: none;
+        }
+        
+        .program-time {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1A202C;
+            min-width: 80px;
+        }
+        
+        .program-activity {
+            flex: 1;
+            margin-left: 20px;
+            font-size: 16px;
+            color: #4a5568;
+        }
+        
+        .rsvp-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            border: 2px solid #718096;
+        }
+        
+        .rsvp-button {
+            display: inline-block;
+            background: #1A202C;
+            color: white;
+            padding: 15px 40px;
+            border: 2px solid #718096;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .rsvp-button:hover {
+            background: white;
+            color: #1A202C;
+        }
+        
+        .qr-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border: 2px solid #718096;
+        }
+        
+        .footer {
+            background: #1A202C;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer a {
+            color: #718096;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="invitation-container">
+        <div class="header">
+            <div class="logo">EXP</div>
+            <h1 class="event-title">{{ invitation_data.event.title }}</h1>
+            <p class="event-subtitle">{{ invitation_data.event.subtitle }}</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Kính gửi {{ invitation_data.guest.title }} {{ invitation_data.guest.name }}
+            </div>
+            
+            <div class="info-section">
+                <div class="info-item">
+                    <div class="info-label">Thời gian:</div>
+                    <div class="info-value">{{ invitation_data.event.datetime | format_datetime }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Địa điểm:</div>
+                    <div class="info-value">{{ invitation_data.event.venue.name }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Tổ chức:</div>
+                    <div class="info-value">{{ invitation_data.event.host_org }}</div>
+                </div>
+            </div>
+            
+            <div class="program">
+                <h3>Chương trình</h3>
+                {% for item in invitation_data.event.program_outline %}
+                <div class="program-item">
+                    <div class="program-time">{{ item.time }}</div>
+                    <div class="program-activity">{{ item.item }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="rsvp-section">
+                <a href="{{ invitation_data.rsvp.rsvp_url }}" class="rsvp-button">
+                    Xác nhận tham gia
+                </a>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    Hạn chót: {{ invitation_data.rsvp.deadline | format_date }}
+                </p>
+            </div>
+            
+            <div class="qr-section">
+                <h3 style="color: #1A202C; margin-bottom: 20px;">QR Code Check-in</h3>
+                <img src="{{ invitation_data.qr_code }}" alt="QR Code" class="qr-code">
+                <p style="color: #666; font-size: 14px;">
+                    Quét mã QR để check-in
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ invitation_data.event.host_org }}</strong></p>
+            <p>Thiệp mời ID: {{ invitation_data.meta.invitation_id }}</p>
+            <p>Tạo ngày: {{ invitation_data.meta.created_at | format_date }}</p>
+            <p>Liên hệ: <a href="mailto:contact@exp-solution.io">contact@exp-solution.io</a></p>
+        </div>
+    </div>
+</body>
+</html>
+        """
+    
+    def _get_festive_template(self) -> str:
+        """
+        Template lễ hội - Vui tươi
+        """
+        return """
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ invitation_data.event.title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(45deg, #C53030 0%, #F56565 25%, #F6AD55 50%, #68D391 75%, #4FD1C7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .invitation-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #C53030 0%, #F56565 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #F6AD55, #68D391);
+            border-radius: 50%;
+            margin: 30px auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            z-index: 1;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .event-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .event-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 22px;
+            color: #2D3748;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .info-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FED7D7 100%);
+            border-radius: 20px;
+            padding: 20px;
+            border: 3px solid #F56565;
+            transition: transform 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .info-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #C53030;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            color: #2D3748;
+            font-weight: 600;
+        }
+        
+        .program {
+            background: linear-gradient(135deg, #68D391 0%, #4FD1C7 100%);
+            color: white;
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .program h3 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .program-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .program-item:last-child {
+            border-bottom: none;
+        }
+        
+        .program-time {
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 80px;
+        }
+        
+        .program-activity {
+            flex: 1;
+            margin-left: 20px;
+            font-size: 16px;
+        }
+        
+        .rsvp-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .rsvp-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #F6AD55 0%, #68D391 100%);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(246, 173, 85, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .rsvp-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .qr-section {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #FED7D7 0%, #FFF5F5 100%);
+            border-radius: 25px;
+            border: 3px solid #F56565;
+        }
+        
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            border: 4px solid #F56565;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #C53030 0%, #F56565 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer a {
+            color: #FED7D7;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="invitation-container">
+        <div class="header">
+            <div class="logo">🎉</div>
+            <h1 class="event-title">{{ invitation_data.event.title }}</h1>
+            <p class="event-subtitle">{{ invitation_data.event.subtitle }}</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Chào mừng {{ invitation_data.guest.title }} {{ invitation_data.guest.name }}! 🎊
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-title">🕐 Thời gian</div>
+                    <div class="info-value">{{ invitation_data.event.datetime | format_datetime }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">🏢 Địa điểm</div>
+                    <div class="info-value">{{ invitation_data.event.venue.name }}</div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-title">🎈 Tổ chức</div>
+                    <div class="info-value">{{ invitation_data.event.host_org }}</div>
+                </div>
+            </div>
+            
+            <div class="program">
+                <h3>🎪 Chương trình vui vẻ</h3>
+                {% for item in invitation_data.event.program_outline %}
+                <div class="program-item">
+                    <div class="program-time">{{ item.time }}</div>
+                    <div class="program-activity">{{ item.item }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="rsvp-section">
+                <a href="{{ invitation_data.rsvp.rsvp_url }}" class="rsvp-button">
+                    🎉 Tham gia ngay!
+                </a>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    Hạn chót: {{ invitation_data.rsvp.deadline | format_date }}
+                </p>
+            </div>
+            
+            <div class="qr-section">
+                <h3 style="color: #C53030; margin-bottom: 20px;">📱 QR Code Check-in</h3>
+                <img src="{{ invitation_data.qr_code }}" alt="QR Code" class="qr-code">
+                <p style="color: #666; font-size: 14px;">
+                    Quét mã QR để check-in siêu nhanh! 🚀
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>{{ invitation_data.event.host_org }}</strong></p>
+            <p>Thiệp mời ID: {{ invitation_data.meta.invitation_id }}</p>
+            <p>Tạo ngày: {{ invitation_data.meta.created_at | format_date }}</p>
+            <p>Liên hệ: <a href="mailto:contact@exp-solution.io">contact@exp-solution.io</a></p>
+        </div>
+    </div>
+</body>
+</html>
+        """
     
     def save_invitation_html(self, invitation_data: Dict[str, Any], filename: str = None) -> str:
         """
@@ -582,6 +1465,7 @@ class InvitationService:
             f.write(html_content)
         
         return filepath
+
 
 
 
