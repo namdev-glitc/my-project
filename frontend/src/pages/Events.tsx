@@ -454,7 +454,16 @@ const Events: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-gray-400 text-sm font-medium">Địa điểm</p>
-                        <p className="text-white text-sm font-semibold">{event.location}</p>
+                        <button
+                          onClick={() => {
+                            const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+                            window.open(searchUrl, '_blank');
+                          }}
+                          className="text-white text-sm font-semibold hover:text-green-400 transition-colors cursor-pointer underline"
+                          title="Click để mở Google Maps"
+                        >
+                          {event.location}
+                        </button>
                       </div>
                     </div>
                   )}
@@ -607,7 +616,18 @@ const Events: React.FC = () => {
                       </div>
                       <h4 className="text-sm font-semibold text-white">Địa điểm</h4>
                     </div>
-                    <p className="text-white font-semibold text-sm mb-2">{selectedEvent.location || 'Chưa cập nhật'}</p>
+                    <button
+                      onClick={() => {
+                        if (selectedEvent.location) {
+                          const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedEvent.location)}`;
+                          window.open(searchUrl, '_blank');
+                        }
+                      }}
+                      className="text-white font-semibold text-sm mb-2 hover:text-orange-400 transition-colors cursor-pointer underline"
+                      title="Click để mở Google Maps"
+                    >
+                      {selectedEvent.location || 'Chưa cập nhật'}
+                    </button>
                     
                     {/* Google Map */}
                     {selectedEvent.location && (

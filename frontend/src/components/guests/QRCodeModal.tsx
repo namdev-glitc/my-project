@@ -20,11 +20,11 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
     setLoading(true);
     try {
       // Lấy QR code từ backend
-      const response = await fetch(`http://localhost:8000/api/guests/${guest.id}/qr`);
+      const response = await fetch(`/api/guests/${guest.id}/qr`);
       if (response.ok) {
         const data = await response.json();
         if (data.qr_image_url) {
-          setQrCodeUrl(`http://localhost:8000${data.qr_image_url}`);
+          setQrCodeUrl(`${data.qr_image_url}`);
         } else {
           // Fallback: tạo QR code từ dữ liệu
           const qrData = JSON.parse(data.qr_data);

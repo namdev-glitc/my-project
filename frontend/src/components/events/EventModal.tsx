@@ -50,22 +50,49 @@ const EventModal: React.FC<EventModalProps> = ({
   }, [event, reset]);
 
   const onSubmit = async (data: any) => {
-    if (event) {
-      if (onUpdate) {
-        onUpdate({ id: event.id, data });
-      } else {
-        await updateEvent(event.id, data);
-        toast.success('Cập nhật sự kiện thành công!');
+    try {
+      // Prepare event data
+      const eventData: any = {
+        name: data.name,
+        description: data.description,
+        location: data.location,
+        max_guests: data.max_guests ? parseInt(data.max_guests) : 100,
+        is_active: data.is_active !== undefined ? data.is_active : true
+      };
+      
+      // Handle event_date - only update if provided
+      if (data.event_date) {
+        if (data.event_time) {
+          eventData.event_date = `${data.event_date}T${data.event_time}:00`;
+        } else {
+          // If no time provided, use existing time or default to 18:00
+          const existingTime = event?.event_date ? new Date(event.event_date).toTimeString().slice(0, 5) : '18:00';
+          eventData.event_date = `${data.event_date}T${existingTime}:00`;
+        }
       }
-    } else {
-      if (onCreate) {
-        onCreate(data);
+      
+      console.log('Event data being sent:', eventData);
+      
+      if (event) {
+        if (onUpdate) {
+          onUpdate({ id: event.id, data: eventData });
+        } else {
+          await updateEvent(event.id, eventData);
+          toast.success('Cập nhật sự kiện thành công!');
+        }
       } else {
-        await createEvent(data);
-        toast.success('Tạo sự kiện thành công!');
+        if (onCreate) {
+          onCreate(eventData);
+        } else {
+          await createEvent(eventData);
+          toast.success('Tạo sự kiện thành công!');
+        }
       }
+      onClose();
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('Có lỗi xảy ra khi cập nhật sự kiện');
     }
-    onClose();
   };
 
   if (!isOpen) return null;

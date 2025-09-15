@@ -498,10 +498,15 @@ async def preview_template(
 ):
     """Preview template with sample data"""
     try:
+        print(f"Preview request: {request_data.dict()}")
+        
         # Get event info
         event = db.query(Event).filter(Event.id == request_data.event_id).first()
         if not event:
+            print(f"Event {request_data.event_id} not found")
             raise HTTPException(status_code=404, detail="Event not found")
+        
+        print(f"Found event: {event.name}")
         
         # Create sample guest data for preview
         sample_guest = {
@@ -524,8 +529,11 @@ async def preview_template(
             "description": event.description
         }
         
+        print(f"Event dict: {event_dict}")
+        
         # Generate invitation data
         invitation_data = invitation_service.generate_invitation_data(sample_guest, event_dict)
+        print(f"Generated invitation data: {invitation_data}")
         
         # Apply customization if provided
         if request_data.customization:
@@ -536,6 +544,7 @@ async def preview_template(
         
         # Generate HTML with template type
         html_content = invitation_service.generate_html_invitation(invitation_data, request_data.template)
+        print(f"Generated HTML content length: {len(html_content)}")
         
         return {
             "html_content": html_content,
@@ -545,6 +554,9 @@ async def preview_template(
         }
     
     except Exception as e:
+        print(f"Error in preview_template: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 

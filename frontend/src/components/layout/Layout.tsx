@@ -12,7 +12,6 @@ import {
   X,
   LogOut
 } from 'lucide-react';
-import ThemeToggle from '../ThemeToggle';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import ExpLogoImage from '../ExpLogoImage';
@@ -42,7 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-exp-dark to-gray-900 dark:bg-gradient-to-br dark:from-indigo-50 dark:via-purple-50 dark:to-cyan-50">
+    <div className="min-h-screen bg-black">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -52,8 +51,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-exp-dark transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-exp-dark transform transition-transform duration-300 ease-in-out lg:translate-x-0 mobile-sidebar ${
+        sidebarOpen ? 'translate-x-0 open' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-700">
           {/* EXP Logo */}
@@ -72,7 +71,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="mt-8 px-4">
+        <nav className="mt-8 px-4 mobile-nav">
           <ul className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
@@ -81,7 +80,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Link
                     to={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    className={`mobile-nav-item flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
                       isActive(item.href)
                         ? 'bg-exp-gradient text-white shadow-lg'
                         : 'text-gray-300 hover:bg-gray-700 hover:text-white'
@@ -126,32 +125,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <div className="sticky top-0 z-40 bg-exp-dark bg-opacity-90 backdrop-blur-sm border-b border-gray-700">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-40 bg-exp-dark bg-opacity-90 backdrop-blur-sm">
+          <div className="mobile-header">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-400 hover:text-white"
+              className="lg:hidden text-gray-400 hover:text-white mobile-btn-sm"
             >
-              <Menu size={24} />
+              <Menu size={20} />
             </button>
             
-            <div className="flex items-center space-x-4">
-              <h2 className="text-white text-xl font-semibold">
-                {t('system.title')}
-              </h2>
-            </div>
+            {/* Removed system title as requested */}
             
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <div className="hidden sm:block text-sm text-gray-400">
-                {t('system.anniversary')}
-              </div>
-            </div>
+            {/* Right placeholder removed as requested */}
           </div>
         </div>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className="px-4 sm:px-6 lg:px-8 pt-0 -mt-2 mobile-container mobile-main-content">
           {children}
         </main>
       </div>

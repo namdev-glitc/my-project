@@ -29,25 +29,52 @@ def get_guests(
     """
     Lấy danh sách khách mời với các bộ lọc
     """
-    query = db.query(Guest)
-    
-    if event_id:
-        query = query.filter(Guest.event_id == event_id)
-    if rsvp_status:
-        query = query.filter(Guest.rsvp_status == rsvp_status)
-    if organization:
-        query = query.filter(Guest.organization.contains(organization))
-    
-    guests = query.offset(skip).limit(limit).all()
-    
-    # Thêm qr_image_url cho mỗi guest
-    for guest in guests:
-        if guest.qr_image_path:
-            guest.qr_image_url = f"/qr_images/{os.path.basename(guest.qr_image_path)}"
-        else:
-            guest.qr_image_url = None
-    
-    return guests
+    try:
+        query = db.query(Guest)
+        
+        if event_id:
+            query = query.filter(Guest.event_id == event_id)
+        if rsvp_status:
+            query = query.filter(Guest.rsvp_status == rsvp_status)
+        if organization:
+            query = query.filter(Guest.organization.contains(organization))
+        
+        guests = query.offset(skip).limit(limit).all()
+        
+        # Convert to GuestResponse objects with qr_image_url
+        from ..schemas.guest import GuestResponse
+        result = []
+        for guest in guests:
+            guest_data = {
+                "id": guest.id,
+                "title": guest.title,
+                "name": guest.name,
+                "role": guest.role,
+                "organization": guest.organization,
+                "tag": guest.tag,
+                "email": guest.email,
+                "phone": guest.phone,
+                "qr_code": guest.qr_code,
+                "qr_image_path": guest.qr_image_path,
+                "qr_image_url": f"/qr_images/{os.path.basename(guest.qr_image_path)}" if guest.qr_image_path else None,
+                "rsvp_status": guest.rsvp_status,
+                "rsvp_response_date": guest.rsvp_response_date,
+                "rsvp_notes": guest.rsvp_notes,
+                "checked_in": bool(guest.checked_in) if guest.checked_in is not None else False,
+                "check_in_time": guest.check_in_time,
+                "check_in_location": guest.check_in_location,
+                "created_at": guest.created_at,
+                "updated_at": guest.updated_at,
+                "event_id": guest.event_id
+            }
+            result.append(GuestResponse(**guest_data))
+        
+        return result
+    except Exception as e:
+        print(f"Error in get_guests: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{guest_id}", response_model=GuestResponse)
 def get_guest(guest_id: int, db: Session = Depends(get_db)):
@@ -140,22 +167,33 @@ def checkin_guest(guest_id: int, checkin: GuestCheckIn, db: Session = Depends(ge
     """
     Check-in khách mời
     """
-    db_guest = db.query(Guest).filter(Guest.id == guest_id).first()
-    if not db_guest:
-        raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
-    
-    if db_guest.checked_in:
-        raise HTTPException(status_code=400, detail="Khách mời đã check-in rồi")
-    
-    db_guest.checked_in = True
-    db_guest.check_in_time = datetime.now()
-    db_guest.check_in_location = checkin.check_in_location
-    db_guest.updated_at = datetime.now()
-    
-    db.commit()
-    db.refresh(db_guest)
-    
-    return db_guest
+    try:
+        print(f"Checkin request for guest {guest_id}: {checkin}")
+        
+        db_guest = db.query(Guest).filter(Guest.id == guest_id).first()
+        if not db_guest:
+            print(f"Guest {guest_id} not found")
+            raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
+        
+        if db_guest.checked_in:
+            print(f"Guest {guest_id} already checked in")
+            raise HTTPException(status_code=400, detail="Khách mời đã check-in rồi")
+        
+        db_guest.checked_in = True
+        db_guest.check_in_time = datetime.now()
+        db_guest.check_in_location = checkin.check_in_location
+        db_guest.updated_at = datetime.now()
+        
+        db.commit()
+        db.refresh(db_guest)
+        
+        print(f"Guest {guest_id} checked in successfully")
+        return db_guest
+    except Exception as e:
+        print(f"Error checking in guest {guest_id}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/import", response_model=dict)
 def import_guests(
@@ -276,26 +314,6 @@ def update_guest_rsvp(guest_id: int, rsvp_data: dict, db: Session = Depends(get_
         "guest": guest
     }
 
-@router.post("/{guest_id}/checkin")
-def checkin_guest(guest_id: int, checkin_data: dict, db: Session = Depends(get_db)):
-    """
-    Check-in khách mời
-    """
-    guest = db.query(Guest).filter(Guest.id == guest_id).first()
-    if not guest:
-        raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
-    
-    # Cập nhật trạng thái check-in
-    guest.checked_in = True
-    guest.checkin_time = datetime.now()
-    
-    db.commit()
-    db.refresh(guest)
-    
-    return {
-        "message": "Check-in thành công",
-        "guest": guest
-    }
 
 @router.delete("/{guest_id}")
 def delete_guest(guest_id: int, db: Session = Depends(get_db)):
@@ -316,24 +334,30 @@ def get_guest_stats(event_id: Optional[int] = None, db: Session = Depends(get_db
     """
     Lấy thống kê khách mời
     """
-    query = db.query(Guest)
-    if event_id:
-        query = query.filter(Guest.event_id == event_id)
-    
-    total_guests = query.count()
-    checked_in = query.filter(Guest.checked_in == True).count()
-    rsvp_accepted = query.filter(Guest.rsvp_status == "accepted").count()
-    rsvp_declined = query.filter(Guest.rsvp_status == "declined").count()
-    rsvp_pending = query.filter(Guest.rsvp_status == "pending").count()
-    
-    return {
-        "total_guests": total_guests,
-        "checked_in": checked_in,
-        "rsvp_accepted": rsvp_accepted,
-        "rsvp_declined": rsvp_declined,
-        "rsvp_pending": rsvp_pending,
-        "check_in_rate": round(checked_in / total_guests * 100, 2) if total_guests > 0 else 0
-    }
+    try:
+        query = db.query(Guest)
+        if event_id:
+            query = query.filter(Guest.event_id == event_id)
+        
+        total_guests = query.count()
+        checked_in = query.filter(Guest.checked_in == True).count()
+        rsvp_accepted = query.filter(Guest.rsvp_status == "accepted").count()
+        rsvp_declined = query.filter(Guest.rsvp_status == "declined").count()
+        rsvp_pending = query.filter(Guest.rsvp_status == "pending").count()
+        
+        return {
+            "total_guests": total_guests,
+            "checked_in": checked_in,
+            "rsvp_accepted": rsvp_accepted,
+            "rsvp_declined": rsvp_declined,
+            "rsvp_pending": rsvp_pending,
+            "check_in_rate": round(checked_in / total_guests * 100, 2) if total_guests > 0 else 0
+        }
+    except Exception as e:
+        print(f"Error in get_guest_stats: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/export/excel")
 def export_guests_excel(

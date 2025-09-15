@@ -15,27 +15,76 @@ const QRScanner: React.FC = () => {
 
   const startScanning = async () => {
     try {
-      if (videoRef.current) {
-        qrScannerRef.current = new QrScanner(
-          videoRef.current,
-          (result) => {
-            handleQRCodeDetected(result.data);
-          },
-          {
-            onDecodeError: (error) => {
-              // Ignore decode errors, they're normal during scanning
-            },
-            highlightScanRegion: true,
-            highlightCodeOutline: true,
-          }
-        );
-        
-        await qrScannerRef.current.start();
-        setIsScanning(true);
-        setError(null);
+      console.log('Starting QR Scanner...');
+      setError(null);
+      
+      // Test button click first
+      console.log('Button clicked successfully!');
+      
+      // Set scanning state first to render video element
+      setIsScanning(true);
+      
+      // Wait for video element to be rendered
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Try multiple times to find video element
+      let videoElement = videoRef.current;
+      if (!videoElement) {
+        console.log('Video ref not found, searching for video element...');
+        videoElement = document.querySelector('video') as HTMLVideoElement;
+        if (videoElement) {
+          console.log('Found video element via querySelector');
+        }
       }
-    } catch (err) {
-      setError('Không thể truy cập camera. Vui lòng cho phép quyền truy cập camera.');
+      
+      if (!videoElement) {
+        console.error('Video element still not found after retry');
+        setError('Video element not found. Please refresh the page and try again.');
+        setIsScanning(false);
+        return;
+      }
+
+      console.log('Video element found:', videoElement);
+
+      // Check if camera is available
+      console.log('Checking camera availability...');
+      const hasCamera = await QrScanner.hasCamera();
+      console.log('Camera available:', hasCamera);
+      
+      if (!hasCamera) {
+        setError('Không tìm thấy camera trên thiết bị này.');
+        setIsScanning(false);
+        return;
+      }
+
+      console.log('Creating QrScanner instance...');
+      qrScannerRef.current = new QrScanner(
+        videoElement,
+        (result) => {
+          console.log('QR Code detected:', result.data);
+          handleQRCodeDetected(result.data);
+        },
+        {
+          onDecodeError: (error) => {
+            // Ignore decode errors, they're normal during scanning
+            console.log('Decode error (normal):', error);
+          },
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          preferredCamera: 'environment', // Use back camera
+          maxScansPerSecond: 5,
+        }
+      );
+      
+      console.log('Starting QrScanner...');
+      await qrScannerRef.current.start();
+      setError(null);
+      console.log('QR Scanner started successfully');
+    } catch (err: any) {
+      console.error('Camera error:', err);
+      const errorMessage = err.message || 'Unknown error';
+      setError(`Không thể truy cập camera: ${errorMessage}. Vui lòng cho phép quyền truy cập camera và thử lại.`);
+      setIsScanning(false);
     }
   };
 
@@ -92,16 +141,26 @@ const QRScanner: React.FC = () => {
       }
       
       if (guestId) {
-        // Auto check-in
-        const result = await checkinGuest(guestId, {
-          check_in_location: 'QR Scanner'
-        });
-        
-        setCheckinResult(result);
-        toast.success('Check-in thành công!');
-        
-        // Stop scanning after successful check-in
-        stopScanning();
+        try {
+          console.log(`Attempting checkin for guest ${guestId}`);
+          
+          // Auto check-in
+          const result = await checkinGuest(guestId, {
+            check_in_location: 'QR Scanner'
+          });
+          
+          console.log('Checkin result:', result);
+          setCheckinResult(result);
+          toast.success(`Check-in thành công cho ${qrData.guest_name || 'khách mời'}`);
+          
+          // Stop scanning after successful check-in
+          stopScanning();
+        } catch (checkinError: any) {
+          console.error('Checkin error:', checkinError);
+          const errorMessage = checkinError.response?.data?.detail || checkinError.message || 'Lỗi không xác định';
+          setError(`Lỗi check-in: ${errorMessage}`);
+          toast.error(`Lỗi check-in: ${errorMessage}`);
+        }
       }
     } catch (err) {
       console.error('Error processing QR code:', err);
@@ -125,20 +184,30 @@ const QRScanner: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">QR Scanner</h1>
-          <p className="text-gray-400 mt-2">
+          <h1 className="text-2xl lg:text-3xl font-bold text-white">QR Scanner</h1>
+          <p className="text-gray-400 mt-2 text-sm lg:text-base">
             Quét QR code để check-in khách mời
           </p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {!isScanning ? (
             <button
               onClick={startScanning}
-              className="btn-exp flex items-center space-x-2"
+              className="mobile-btn flex items-center space-x-2"
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease'
+              }}
             >
               <Camera size={20} />
               <span>Bắt đầu quét</span>
@@ -146,7 +215,7 @@ const QRScanner: React.FC = () => {
           ) : (
             <button
               onClick={stopScanning}
-              className="btn-exp flex items-center space-x-2 bg-red-600 hover:bg-red-700"
+              className="mobile-btn flex items-center space-x-2 bg-red-600 hover:bg-red-700"
             >
               <X size={20} />
               <span>Dừng quét</span>
@@ -156,26 +225,26 @@ const QRScanner: React.FC = () => {
       </div>
 
       {/* Scanner Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Camera View */}
-        <div className="card-exp">
-          <h3 className="text-lg font-semibold text-white mb-4">
+        <div className="mobile-card card-exp">
+          <h3 className="text-base lg:text-lg font-semibold text-white mb-4">
             Camera Scanner
           </h3>
           
           <div className="relative bg-black rounded-lg overflow-hidden">
-            {isScanning ? (
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                className="w-full h-64 object-cover"
-              />
-            ) : (
-              <div className="w-full h-64 flex items-center justify-center bg-gray-800">
-                <div className="text-center">
-                  <Camera size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-400">Nhấn "Bắt đầu quét" để mở camera</p>
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-48 lg:h-64 object-cover ${isScanning ? 'block' : 'hidden'}`}
+            />
+            {!isScanning && (
+              <div className="w-full h-48 lg:h-64 flex items-center justify-center bg-gray-800">
+                <div className="text-center p-4">
+                  <Camera size={40} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-400 text-sm lg:text-base">Nhấn "Bắt đầu quét" để mở camera</p>
                 </div>
               </div>
             )}
@@ -183,11 +252,11 @@ const QRScanner: React.FC = () => {
             {/* QR Code Overlay */}
             {isScanning && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-48 h-48 border-2 border-exp-primary rounded-lg relative">
-                  <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-exp-primary rounded-tl-lg"></div>
-                  <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-exp-primary rounded-tr-lg"></div>
-                  <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-exp-primary rounded-bl-lg"></div>
-                  <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-exp-primary rounded-br-lg"></div>
+                <div className="mobile-qr-overlay w-40 h-40 lg:w-48 lg:h-48 border-2 border-exp-primary rounded-lg relative">
+                  <div className="absolute top-0 left-0 w-4 h-4 lg:w-6 lg:h-6 border-t-2 border-l-2 border-exp-primary rounded-tl-lg"></div>
+                  <div className="absolute top-0 right-0 w-4 h-4 lg:w-6 lg:h-6 border-t-2 border-r-2 border-exp-primary rounded-tr-lg"></div>
+                  <div className="absolute bottom-0 left-0 w-4 h-4 lg:w-6 lg:h-6 border-b-2 border-l-2 border-exp-primary rounded-bl-lg"></div>
+                  <div className="absolute bottom-0 right-0 w-4 h-4 lg:w-6 lg:h-6 border-b-2 border-r-2 border-exp-primary rounded-br-lg"></div>
                 </div>
               </div>
             )}

@@ -19,6 +19,7 @@ import CheckIn from './pages/CheckIn';
 import Invitation from './pages/Invitation';
 import './App.css';
 import './exp-brand.css';
+import './tweaks.css';
 
 // Create a client
 const queryClient = new QueryClient({

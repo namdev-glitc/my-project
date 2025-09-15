@@ -52,20 +52,32 @@ def update_event(event_id: int, event_update: EventUpdate, db: Session = Depends
     """
     Cập nhật thông tin sự kiện
     """
-    db_event = db.query(Event).filter(Event.id == event_id).first()
-    if not db_event:
-        raise HTTPException(status_code=404, detail="Không tìm thấy sự kiện")
-    
-    # Cập nhật các trường
-    update_data = event_update.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_event, field, value)
-    
-    db_event.updated_at = datetime.now()
-    db.commit()
-    db.refresh(db_event)
-    
-    return db_event
+    try:
+        print(f"Updating event {event_id} with data: {event_update.dict()}")
+        
+        db_event = db.query(Event).filter(Event.id == event_id).first()
+        if not db_event:
+            raise HTTPException(status_code=404, detail="Không tìm thấy sự kiện")
+        
+        # Cập nhật các trường
+        update_data = event_update.dict(exclude_unset=True)
+        print(f"Update data: {update_data}")
+        
+        for field, value in update_data.items():
+            print(f"Setting {field} = {value} (type: {type(value)})")
+            setattr(db_event, field, value)
+        
+        db_event.updated_at = datetime.now()
+        db.commit()
+        db.refresh(db_event)
+        
+        print(f"Event updated successfully: {db_event.name}")
+        return db_event
+    except Exception as e:
+        print(f"Error updating event: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/{event_id}")
 def delete_event(event_id: int, db: Session = Depends(get_db)):

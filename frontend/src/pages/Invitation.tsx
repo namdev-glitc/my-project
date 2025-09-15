@@ -279,7 +279,7 @@ const Invitation: React.FC = () => {
                     {guest.qr_image_url ? (
                       <div className="relative">
                         <img
-                          src={`http://localhost:8000${guest.qr_image_url}`}
+                          src={`${guest.qr_image_url}`}
                           alt="QR Code"
                           className="w-64 h-64 border-4 border-gray-200 rounded-2xl shadow-lg"
                           onError={(e) => {
@@ -309,7 +309,7 @@ const Invitation: React.FC = () => {
                         onClick={() => {
                           if (guest.qr_image_url) {
                             const link = document.createElement('a');
-                            link.href = `http://localhost:8000${guest.qr_image_url}`;
+                            link.href = `${guest.qr_image_url}`;
                             link.download = `qr_code_${guest.name}.png`;
                             link.click();
                           }
@@ -326,10 +326,10 @@ const Invitation: React.FC = () => {
                             navigator.share({
                               title: `QR Code Check-in - ${guest.name}`,
                               text: `QR Code check-in cho sự kiện ${event.name}`,
-                              url: `http://localhost:8000${guest.qr_image_url}`
+                              url: `${guest.qr_image_url}`
                             }).catch(() => {
                               // Fallback nếu không hỗ trợ Web Share API
-                              navigator.clipboard.writeText(`http://localhost:8000${guest.qr_image_url}`);
+                              navigator.clipboard.writeText(`${guest.qr_image_url}`);
                               alert('Đã sao chép link QR code!');
                             });
                           }

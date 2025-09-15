@@ -24,7 +24,7 @@ import QRCodeModal from '../components/guests/QRCodeModal';
 import CountdownTimer from '../components/CountdownTimer';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = '';
 
 const Invitations: React.FC = () => {
   const navigate = useNavigate();
@@ -95,7 +95,7 @@ const Invitations: React.FC = () => {
   const generateInvitation = async (guestId: number) => {
     setIsGenerating(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/invitations/generate/${guestId}`, {
+      const response = await fetch(`/api/invitations/generate/${guestId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const Invitations: React.FC = () => {
       
       if (response.ok) {
         if (data.already_exists) {
-          const url = `http://localhost:8000${data.download_url || '/invitations/' + data.filename}`;
+          const url = `${data.download_url || '/invitations/' + data.filename}`;
           window.open(url, '_blank');
           toast(`Thiệp mời đã tồn tại!`, { icon: 'ℹ️' });
         } else {
@@ -129,7 +129,7 @@ const Invitations: React.FC = () => {
   const generateAllInvitations = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch('http://localhost:8000/api/invitations/generate-all', {
+      const response = await fetch('/api/invitations/generate-all', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ const Invitations: React.FC = () => {
     
     setIsGenerating(true);
     try {
-      const response = await fetch('http://localhost:8000/api/invitations/generate-bulk', {
+      const response = await fetch('/api/invitations/generate-bulk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -189,12 +189,12 @@ const Invitations: React.FC = () => {
 
   const downloadInvitation = async (guestId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/invitations/download/${guestId}`);
+      const response = await fetch(`/api/invitations/download/${guestId}`);
       const data = await response.json();
       
       if (response.ok) {
         const link = document.createElement('a');
-        link.href = `http://localhost:8000/invitations/${data.filename}`;
+        link.href = `/invitations/${data.filename}`;
         link.download = data.filename;
         link.click();
         toast.success('Tải xuống thành công! 📥');
@@ -208,7 +208,7 @@ const Invitations: React.FC = () => {
 
   const sendInvitationEmail = async (guestId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/invitations/send-email/${guestId}`, {
+      const response = await fetch(`/api/invitations/send-email/${guestId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

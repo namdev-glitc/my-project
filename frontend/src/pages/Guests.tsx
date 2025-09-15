@@ -107,7 +107,7 @@ const Guests: React.FC = () => {
 
   const handleExportExcel = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/guests/export/excel`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL || '/api'}/guests/export/excel`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
