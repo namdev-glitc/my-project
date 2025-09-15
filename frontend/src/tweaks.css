@@ -10,6 +10,9 @@ body, #root, .App {
   background-color: #000000 !important;
 }
 
+/* Ensure default text is visible on black background */
+/* Revert text color overrides to allow original theme */
+
 /* Override any white backgrounds */
 .bg-white, .bg-gray-50, .bg-gray-100, .bg-white\/95, .bg-white\/10, .bg-white\/5, .bg-white\/20 {
   background-color: #000000 !important;

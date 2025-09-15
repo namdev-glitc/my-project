@@ -31,26 +31,19 @@ const Dashboard: React.FC = () => {
     }
   );
 
-  // Lấy danh sách sự kiện và chỉ lấy thống kê khi có sự kiện thực tế
+  const { data: eventStats } = useQuery(
+    'eventStats',
+    () => getEventStats(1)
+  );
+
   const { data: events } = useQuery(
     'events',
-    () => fetch(`${process.env.REACT_APP_API_URL || '/api'}/events/`).then(res => res.json()),
+    () => fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/events/`).then(res => res.json()),
     {
-      refetchInterval: 30000,
+      refetchInterval: 30000, // Refresh every 30 seconds để cập nhật sự kiện
       refetchOnWindowFocus: true
     }
   );
-
-  const firstEventId = events?.[0]?.id;
-  const { data: eventStats } = useQuery(
-    ['eventStats', firstEventId],
-    () => getEventStats(firstEventId),
-    {
-      enabled: !!firstEventId
-    }
-  );
-
-  // (đã chuyển khối lấy events lên trên)
 
   const handleQRScanner = () => {
     navigate('/scanner');
@@ -58,7 +51,7 @@ const Dashboard: React.FC = () => {
 
   const handleExportReport = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || '/api'}/guests/export/excel`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/guests/export/excel`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -115,7 +108,7 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="relative space-y-6 dashboard-page">
+    <div className="relative space-y-6">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-purple-900/5 to-orange-900/10 pointer-events-none"></div>
       <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
@@ -123,16 +116,14 @@ const Dashboard: React.FC = () => {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-orange-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
       
       {/* Header */}
-      <div className="relative z-10 dash-header dash-flush">
-        <div className="text-center mb-6 dash-title">
+      <div className="relative z-10 flex items-center justify-between">
+        <div>
           <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">{t('dashboard.title')}</h1>
           <p className="text-gray-300 mt-2 text-lg">
             {t('dashboard.subtitle')}
           </p>
         </div>
-        
-        {/* Action Buttons */}
-        <div className="flex justify-center space-x-3 mb-6 dash-actions">
+        <div className="flex space-x-3">
           <button 
             onClick={() => window.location.reload()}
             className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 flex items-center space-x-2"
