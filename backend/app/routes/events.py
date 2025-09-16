@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
+import logging
 from ..database import get_db
 from ..models.event import Event
 from ..schemas.event import EventCreate, EventUpdate, EventResponse
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -37,15 +40,40 @@ def get_event(event_id: int, db: Session = Depends(get_db)):
     return event
 
 @router.post("/", response_model=EventResponse)
-def create_event(event: EventCreate, db: Session = Depends(get_db)):
+async def create_event(request: Request, db: Session = Depends(get_db)):
     """
     Tạo sự kiện mới
     """
-    db_event = Event(**event.dict())
-    db.add(db_event)
-    db.commit()
-    db.refresh(db_event)
-    return db_event
+    try:
+        # Parse request body
+        body = await request.body()
+        import json
+        json_data = json.loads(body)
+        event = EventCreate(**json_data)
+        
+        # Validate required fields
+        if not event.name:
+            raise HTTPException(status_code=422, detail="Tên sự kiện không được để trống")
+        
+        if not event.event_date:
+            raise HTTPException(status_code=422, detail="Ngày sự kiện không được để trống")
+        
+        db_event = Event(**event.dict())
+        db.add(db_event)
+        db.commit()
+        db.refresh(db_event)
+        
+        print(f"Event created successfully: {db_event.name}")
+        return db_event
+        
+    except Exception as e:
+        logger.error(f"Error creating event: {str(e)}")
+        print(f"🔍 ERROR creating event: {str(e)}")
+        print(f"🔍 ERROR type: {type(e)}")
+        import traceback
+        traceback.print_exc()
+        db.rollback()
+        raise HTTPException(status_code=422, detail=f"Lỗi tạo sự kiện: {str(e)}")
 
 @router.put("/{event_id}", response_model=EventResponse)
 def update_event(event_id: int, event_update: EventUpdate, db: Session = Depends(get_db)):

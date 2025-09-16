@@ -1,10 +1,13 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
+import logging
 from .database import engine, Base
 from .routes import guests, events, invitations, auth
+
+logger = logging.getLogger(__name__)
 
 # Tạo thư mục static
 os.makedirs("static", exist_ok=True)
@@ -18,6 +21,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
 
 # CORS middleware
 app.add_middleware(

@@ -29,70 +29,51 @@ const EventModal: React.FC<EventModalProps> = ({
         name: event.name || '',
         description: event.description || '',
         event_date: event.event_date ? event.event_date.split('T')[0] : '',
-        event_time: event.event_time || '',
         location: event.location || '',
         max_guests: event.max_guests || 100,
-        is_active: event.is_active !== undefined ? event.is_active : true,
-        registration_open: event.registration_open !== undefined ? event.registration_open : true
+        is_active: event.is_active !== undefined ? event.is_active : true
       });
     } else {
       reset({
         name: '',
         description: '',
         event_date: '',
-        event_time: '',
         location: '',
         max_guests: 100,
-        is_active: true,
-        registration_open: true
+        is_active: true
       });
     }
   }, [event, reset]);
 
   const onSubmit = async (data: any) => {
-    try {
-      // Prepare event data
-      const eventData: any = {
-        name: data.name,
-        description: data.description,
-        location: data.location,
-        max_guests: data.max_guests ? parseInt(data.max_guests) : 100,
-        is_active: data.is_active !== undefined ? data.is_active : true
-      };
-      
-      // Handle event_date - only update if provided
-      if (data.event_date) {
-        if (data.event_time) {
-          eventData.event_date = `${data.event_date}T${data.event_time}:00`;
-        } else {
-          // If no time provided, use existing time or default to 18:00
-          const existingTime = event?.event_date ? new Date(event.event_date).toTimeString().slice(0, 5) : '18:00';
-          eventData.event_date = `${data.event_date}T${existingTime}:00`;
-        }
-      }
-      
-      console.log('Event data being sent:', eventData);
-      
-      if (event) {
-        if (onUpdate) {
-          onUpdate({ id: event.id, data: eventData });
-        } else {
-          await updateEvent(event.id, eventData);
-          toast.success('Cập nhật sự kiện thành công!');
-        }
+    // Prepare data according to backend schema
+    const eventData = {
+      name: data.name,
+      description: data.description,
+      event_date: data.event_date ? new Date(data.event_date).toISOString() : new Date().toISOString(),
+      location: data.location,
+      max_guests: parseInt(data.max_guests) || 100,
+      is_active: data.is_active !== undefined ? data.is_active : true
+    };
+
+
+
+    if (event) {
+      if (onUpdate) {
+        onUpdate({ id: event.id, data: eventData });
       } else {
-        if (onCreate) {
-          onCreate(eventData);
-        } else {
-          await createEvent(eventData);
-          toast.success('Tạo sự kiện thành công!');
-        }
+        await updateEvent(event.id, eventData);
+        toast.success('Cập nhật sự kiện thành công!');
       }
-      onClose();
-    } catch (error) {
-      console.error('Error updating event:', error);
-      toast.error('Có lỗi xảy ra khi cập nhật sự kiện');
+    } else {
+      if (onCreate) {
+        onCreate(eventData);
+      } else {
+        await createEvent(eventData);
+        toast.success('Tạo sự kiện thành công!');
+      }
     }
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -150,33 +131,21 @@ const EventModal: React.FC<EventModalProps> = ({
                   />
                 </div>
 
-                {/* Date and Time */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Ngày sự kiện *
-                    </label>
-                    <input
-                      type="date"
-                      {...register('event_date', { required: 'Ngày sự kiện là bắt buộc' })}
-                      className="w-full input-exp"
-                    />
-                    {errors.event_date && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {String(errors.event_date?.message || 'Lỗi validation')}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Giờ sự kiện
-                    </label>
-                    <input
-                      type="time"
-                      {...register('event_time')}
-                      className="w-full input-exp"
-                    />
-                  </div>
+                {/* Event Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Ngày sự kiện *
+                  </label>
+                  <input
+                    type="date"
+                    {...register('event_date', { required: 'Ngày sự kiện là bắt buộc' })}
+                    className="w-full input-exp"
+                  />
+                  {errors.event_date && (
+                    <p className="text-red-400 text-xs mt-1">
+                      {String(errors.event_date?.message || 'Lỗi validation')}
+                    </p>
+                  )}
                 </div>
 
                 {/* Location and Max Guests */}
@@ -206,31 +175,17 @@ const EventModal: React.FC<EventModalProps> = ({
                 </div>
 
                 {/* Status */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Trạng thái
-                    </label>
-                    <select
-                      {...register('is_active')}
-                      className="w-full input-exp"
-                    >
-                      <option value="true">Hoạt động</option>
-                      <option value="false">Tạm dừng</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Đăng ký
-                    </label>
-                    <select
-                      {...register('registration_open')}
-                      className="w-full input-exp"
-                    >
-                      <option value="true">Mở đăng ký</option>
-                      <option value="false">Đóng đăng ký</option>
-                    </select>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Trạng thái
+                  </label>
+                  <select
+                    {...register('is_active')}
+                    className="w-full input-exp"
+                  >
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Tạm dừng</option>
+                  </select>
                 </div>
               </div>
             </div>

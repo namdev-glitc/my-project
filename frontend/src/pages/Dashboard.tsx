@@ -38,7 +38,7 @@ const Dashboard: React.FC = () => {
 
   const { data: events } = useQuery(
     'events',
-    () => fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/events/`).then(res => res.json()),
+    () => fetch(`${process.env.REACT_APP_API_URL || '/api'}/events/`).then(res => res.json()),
     {
       refetchInterval: 30000, // Refresh every 30 seconds để cập nhật sự kiện
       refetchOnWindowFocus: true
@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
 
   const handleExportReport = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/guests/export/excel`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL || '/api'}/guests/export/excel`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);

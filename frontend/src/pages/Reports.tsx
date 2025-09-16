@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { 
   Download, 
@@ -348,111 +348,112 @@ const Reports: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 lg:space-y-6">
+    <div className="space-y-6">
       {/* Enhanced Header */}
-      <div className="mobile-page-header">
-        <div className="mobile-section-header">
-          <div className="mobile-flex mobile-items-center mobile-gap-3">
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-exp-gradient rounded-lg flex items-center justify-center">
-              <BarChart3 size={20} className="text-white" />
-            </div>
-            <div>
-              <h1 className="mobile-page-title">Báo cáo & Phân tích</h1>
-              <p className="mobile-page-subtitle">
-                Dashboard thống kê và phân tích chi tiết
-              </p>
-            </div>
-          </div>
+      <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-6 border border-gray-700/50">
+      <div className="flex items-center justify-between">
+        <div>
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-10 h-10 bg-exp-gradient rounded-lg flex items-center justify-center">
+                <BarChart3 size={24} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white">Báo cáo & Phân tích</h1>
+                <p className="text-gray-300">
+                  Dashboard thống kê và phân tích chi tiết
+          </p>
         </div>
+            </div>
             
-        {/* Event Selector */}
-        <div className="mobile-form-group">
-          <label className="mobile-form-label mobile-flex mobile-items-center mobile-gap-2">
-            <Calendar size={16} className="text-blue-300" />
-            Sự kiện:
-          </label>
-          <select
-            value={selectedEvent?.id || ''}
-            onChange={(e) => {
-              const event = events?.find((ev: any) => ev.id === parseInt(e.target.value));
-              setSelectedEvent(event);
-            }}
-            className="mobile-select"
-          >
-            {events?.map((event: any) => (
-              <option key={event.id} value={event.id}>
-                {event.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        {/* Auto-refresh indicator */}
-        {autoRefresh && (
-          <div className="mobile-flex mobile-items-center mobile-gap-2 text-green-300 mobile-mb-4">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-xs">Auto-refresh {refreshInterval}s</span>
+            {/* Event Selector */}
+            <div className="flex items-center space-x-4 mt-3">
+              <div className="flex items-center space-x-2">
+                <Calendar size={16} className="text-blue-300" />
+                <span className="text-sm text-gray-300">Sự kiện:</span>
+                <select
+                  value={selectedEvent?.id || ''}
+                  onChange={(e) => {
+                    const event = events?.find((ev: any) => ev.id === parseInt(e.target.value));
+                    setSelectedEvent(event);
+                  }}
+                  className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                >
+                  {events?.map((event: any) => (
+                    <option key={event.id} value={event.id}>
+                      {event.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Auto-refresh indicator */}
+              {autoRefresh && (
+                <div className="flex items-center space-x-2 text-green-300">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs">Auto-refresh {refreshInterval}s</span>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-        
-        {/* Action Buttons */}
-        <div className="mobile-action-buttons">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`mobile-action-btn ${
-              showFilters ? 'mobile-action-btn-primary' : 'mobile-action-btn-secondary'
-            }`}
-          >
-            <Filter size={16} />
-            <span className="hidden sm:inline">Lọc</span>
-          </button>
           
-          <button
-            onClick={refreshData}
-            className="mobile-action-btn mobile-action-btn-secondary"
-          >
-            <RefreshCw size={16} />
-            <span className="hidden sm:inline">Làm mới</span>
-          </button>
-          
-          <button
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`mobile-action-btn ${
-              autoRefresh ? 'mobile-action-btn-primary' : 'mobile-action-btn-secondary'
-            }`}
-          >
-            <Zap size={16} />
-            <span className="hidden sm:inline">Auto</span>
-          </button>
-          
-          {autoRefresh && (
-            <select
-              value={refreshInterval}
-              onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
-              className="mobile-select"
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-3">
+        <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`p-3 rounded-lg transition-colors ${
+                showFilters ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
+              }`}
             >
-              <option value={15}>15s</option>
-              <option value={30}>30s</option>
-              <option value={60}>1m</option>
-              <option value={300}>5m</option>
-            </select>
-          )}
-          
-          <button
-            onClick={() => exportReport('excel')}
-            className="mobile-action-btn mobile-action-btn-primary"
-          >
-            <FileText size={16} />
-            <span className="hidden sm:inline">Excel</span>
-          </button>
-          
-          <button
-            onClick={() => exportReport('pdf')}
-            className="mobile-action-btn mobile-action-btn-primary"
-          >
-            <Download size={16} />
-            <span className="hidden sm:inline">PDF</span>
-          </button>
+              <Filter size={20} className="text-white" />
+            </button>
+            
+            <button
+              onClick={refreshData}
+              className="p-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
+            >
+              <RefreshCw size={20} className="text-white" />
+            </button>
+            
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setAutoRefresh(!autoRefresh)}
+                className={`p-3 rounded-lg transition-colors ${
+                  autoRefresh ? 'bg-green-600' : 'bg-gray-700 hover:bg-gray-600'
+                }`}
+              >
+                <Zap size={20} className="text-white" />
+              </button>
+              {autoRefresh && (
+                <select
+                  value={refreshInterval}
+                  onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
+                  className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs"
+                >
+                  <option value={15}>15s</option>
+                  <option value={30}>30s</option>
+                  <option value={60}>1m</option>
+                  <option value={300}>5m</option>
+                </select>
+              )}
+            </div>
+            
+            <div className="flex space-x-2">
+              <button
+                onClick={() => exportReport('excel')}
+          className="btn-exp flex items-center space-x-2"
+        >
+                <FileText size={16} />
+                <span>Excel</span>
+              </button>
+        <button
+                onClick={() => exportReport('pdf')}
+          className="btn-exp flex items-center space-x-2"
+        >
+                <Download size={16} />
+                <span>PDF</span>
+        </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -542,7 +543,7 @@ const Reports: React.FC = () => {
       )}
 
       {/* Navigation Tabs */}
-      <div className="mobile-tabs">
+      <div className="flex space-x-1 bg-gray-800/50 rounded-lg p-1">
         {[
           { id: 'overview', name: 'Tổng quan', icon: BarChart3 },
           { id: 'trends', name: 'Xu hướng', icon: LineChart },
@@ -554,13 +555,15 @@ const Reports: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`mobile-tab mobile-flex mobile-items-center mobile-justify-center mobile-gap-2 ${
-                activeTab === tab.id ? 'active' : ''
+              className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-md transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-exp-gradient text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
               }`}
             >
               <Icon size={16} />
-              <span className="mobile-text-sm font-medium">{tab.name}</span>
-            </button>
+              <span className="text-sm font-medium">{tab.name}</span>
+        </button>
           );
         })}
       </div>
@@ -569,12 +572,12 @@ const Reports: React.FC = () => {
       {activeTab === 'overview' && (
         <>
       {/* Stats Overview */}
-      <div className="mobile-stats-grid grid grid-cols-1 md:grid-cols-4 gap-4 lg:gap-6">
-            <div className="mobile-stat-card card-exp group hover:scale-105 transition-transform duration-200">
-          <div className="mobile-flex mobile-items-center mobile-justify-between">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="card-exp group hover:scale-105 transition-transform duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="mobile-stat-label">Tổng khách mời</p>
-              <p className="mobile-stat-value">
+              <p className="text-gray-400 text-sm font-medium">Tổng khách mời</p>
+              <p className="text-2xl font-bold text-white mt-1">
                 {guestStats?.total_guests || 0}
               </p>
                   <p className="text-blue-400 text-xs mt-1">
@@ -587,28 +590,28 @@ const Reports: React.FC = () => {
           </div>
         </div>
 
-            <div className="mobile-stat-card card-exp group hover:scale-105 transition-transform duration-200">
-          <div className="mobile-flex mobile-items-center mobile-justify-between">
+            <div className="card-exp group hover:scale-105 transition-transform duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="mobile-stat-label">Đã check-in</p>
-              <p className="mobile-stat-value">
+              <p className="text-gray-400 text-sm font-medium">Đã check-in</p>
+              <p className="text-2xl font-bold text-white mt-1">
                 {guestStats?.checked_in || 0}
               </p>
-              <p className="text-green-400 text-xs mt-1">
+              <p className="text-green-400 text-sm">
                 {guestStats?.check_in_rate || 0}% tỷ lệ
               </p>
             </div>
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">
-              <CheckCircle size={20} className="text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">
+              <CheckCircle size={24} className="text-white" />
             </div>
           </div>
         </div>
 
-            <div className="mobile-stat-card card-exp group hover:scale-105 transition-transform duration-200">
-          <div className="mobile-flex mobile-items-center mobile-justify-between">
+            <div className="card-exp group hover:scale-105 transition-transform duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="mobile-stat-label">RSVP Chấp nhận</p>
-              <p className="mobile-stat-value">
+              <p className="text-gray-400 text-sm font-medium">RSVP Chấp nhận</p>
+              <p className="text-2xl font-bold text-white mt-1">
                 {guestStats?.rsvp_accepted || 0}
               </p>
                   <p className="text-purple-400 text-xs mt-1">
@@ -617,39 +620,39 @@ const Reports: React.FC = () => {
                       : 0}% tỷ lệ
               </p>
             </div>
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">
-              <TrendingUp size={20} className="text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">
+              <TrendingUp size={24} className="text-white" />
             </div>
           </div>
         </div>
 
-            <div className="mobile-stat-card card-exp group hover:scale-105 transition-transform duration-200">
-          <div className="mobile-flex mobile-items-center mobile-justify-between">
+            <div className="card-exp group hover:scale-105 transition-transform duration-200">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="mobile-stat-label">Chờ phản hồi</p>
-              <p className="mobile-stat-value">
+              <p className="text-gray-400 text-sm font-medium">Chờ phản hồi</p>
+              <p className="text-2xl font-bold text-white mt-1">
                 {guestStats?.rsvp_pending || 0}
               </p>
                   {guestStats?.rsvp_pending > 0 && (
-                    <p className="text-yellow-400 text-xs mt-1 mobile-flex mobile-items-center">
+                    <p className="text-yellow-400 text-xs mt-1 flex items-center">
                       <AlertTriangle size={12} className="mr-1" />
                       Cần theo dõi
                     </p>
                   )}
             </div>
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">
-              <Clock size={20} className="text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform duration-200">
+              <Clock size={24} className="text-white" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Charts */}
-      <div className="mobile-grid grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* RSVP Status Chart */}
-        <div className="mobile-chart-container card-exp">
-          <h3 className="mobile-chart-title">
-            <PieChartIcon size={20} className="text-blue-400" />
+        <div className="card-exp">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+            <PieChartIcon size={20} className="mr-2 text-blue-400" />
             Phân bố RSVP
           </h3>
           

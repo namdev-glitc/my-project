@@ -146,13 +146,27 @@ export const getEvent = async (id: number) => {
 };
 
 export const createEvent = async (event: any) => {
-  const response = await api.post('/events/', event);
-  return response.data;
+  console.log('🔍 API: createEvent - Sending data:', event);
+  try {
+    const response = await api.post('/events/', event);
+    console.log('✅ API: createEvent - Success:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ API: createEvent - Error:', error);
+    throw error;
+  }
 };
 
 export const updateEvent = async (id: number, event: any) => {
-  const response = await api.put(`/events/${id}`, event);
-  return response.data;
+  console.log('🔍 API: updateEvent - Sending data:', { id, event });
+  try {
+    const response = await api.put(`/events/${id}`, event);
+    console.log('✅ API: updateEvent - Success:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ API: updateEvent - Error:', error);
+    throw error;
+  }
 };
 
 export const deleteEvent = async (id: number) => {

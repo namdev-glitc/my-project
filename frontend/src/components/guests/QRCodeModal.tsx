@@ -11,8 +11,6 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  // Debug logging
-  console.log('QRCodeModal render:', { isOpen, guest: guest?.name });
 
   const generateQRCode = useCallback(async () => {
     if (!guest) return;

@@ -5,10 +5,18 @@ import { Calendar, MapPin, Clock } from 'lucide-react';
 const EventsList: React.FC = () => {
   const { data: events, isLoading } = useQuery(
     'events',
-    () => fetch(`${process.env.REACT_APP_API_URL || '/api'}/events/`).then(res => res.json()),
+    async () => {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || '/api'}/events/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
     {
       refetchInterval: 30000,
-      refetchOnWindowFocus: true
+      refetchOnWindowFocus: true,
+      retry: 3,
+      retryDelay: 1000
     }
   );
 
