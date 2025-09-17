@@ -216,9 +216,9 @@ const LoginPage: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-300">
               Chưa có tài khoản?{' '}
-              <a href="#" className="text-blue-400 hover:text-blue-300 font-medium">
+              <button onClick={() => navigate('/register')} className="text-blue-400 hover:text-blue-300 font-medium">
                 Đăng ký
-              </a>
+              </button>
             </p>
           </div>
 

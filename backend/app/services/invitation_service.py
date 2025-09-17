@@ -216,8 +216,8 @@ class InvitationService:
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0B2A4A 0%, #1E88E5 100%);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: radial-gradient(1200px 800px at 50% -200px, #1b2454 0%, #150f2e 50%, #0a0a1a 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -225,16 +225,38 @@ class InvitationService:
         .invitation-container {
             max-width: 600px;
             margin: 0 auto;
-            background: white;
+            background: #ffffff;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            position: relative;
+            border: 1px solid rgba(212,175,55,0.35); /* gold foil */
+        }
+
+        /* soft vignette and subtle pattern */
+        .invitation-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(120% 80% at 50% -20%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 50%),
+                        radial-gradient(120% 80% at 50% 120%, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0) 40%);
+            pointer-events: none;
+        }
+
+        /* inner subtle border to create depth */
+        .invitation-container::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(212,175,55,0.25);
+            pointer-events: none;
         }
         
         .header {
-            background: linear-gradient(135deg, #0B2A4A 0%, #1E88E5 100%);
-            color: white;
-            padding: 40px 30px;
+            background: linear-gradient(135deg, #101935 0%, #291b5c 60%, #3b1f6d 100%);
+            color: #fff8e7;
+            padding: 48px 30px 36px;
             text-align: center;
             position: relative;
         }
@@ -249,29 +271,50 @@ class InvitationService:
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
             opacity: 0.3;
         }
-        
-        .logo {
+
+        /* corner ornaments */
+        .ornament {
+            position: absolute;
             width: 80px;
             height: 80px;
-            background: white;
+            opacity: .5;
+            pointer-events: none;
+            background-repeat: no-repeat;
+            background-size: contain;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,.3));
+        }
+        .ornament.tl { left: 8px; top: 8px; transform: rotate(0deg); }
+        .ornament.br { right: 8px; bottom: 8px; transform: rotate(180deg); }
+        .ornament.tl, .ornament.br {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M2 62 Q24 40 24 24 Q24 10 38 2" fill="none" stroke="%23d4af37" stroke-width="2"/><circle cx="40" cy="2" r="2" fill="%23f3e8a3"/></svg>');
+        }
+        
+        .logo {
+            width: 88px;
+            height: 88px;
+            background: rgba(255,255,255,0.1);
             border-radius: 50%;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #0B2A4A;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fff8e7;
             position: relative;
             z-index: 1;
+            border: 2px solid rgba(212,175,55,0.55);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), 0 6px 18px rgba(0,0,0,0.35);
         }
         
         .event-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 6px;
             position: relative;
             z-index: 1;
+            color: #fff8e7;
         }
         
         .event-subtitle {
@@ -279,31 +322,48 @@ class InvitationService:
             opacity: 0.9;
             position: relative;
             z-index: 1;
+            color: #efe7cf;
+        }
+
+        .date-badge {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 6px 12px;
+            border: 1px solid rgba(212,175,55,.6);
+            border-radius: 999px;
+            color: #fff8e7;
+            font-size: 12px;
+            letter-spacing: .5px;
+            background: linear-gradient(135deg, rgba(212,175,55,.25), rgba(255,255,255,.08));
         }
         
         .content {
             padding: 40px 30px;
         }
+
+        /* divider with diamond */
+        .divider { position: relative; margin: 24px auto; height: 1px; background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(212,175,55,.5) 50%, rgba(212,175,55,0) 100%);}        
+        .divider .diamond { position: absolute; left: 50%; top: -5px; width: 10px; height: 10px; background: linear-gradient(135deg, #d4af37, #f3e8a3); transform: translateX(-50%) rotate(45deg); box-shadow: 0 2px 6px rgba(0,0,0,.2);}        
         
         .greeting {
             font-size: 18px;
-            color: #333;
+            color: #2a2a2a;
             margin-bottom: 30px;
             text-align: center;
         }
         
         .guest-info {
-            background: #f8f9fa;
+            background: #fbfbfb;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
-            border-left: 4px solid #1E88E5;
+            border-left: 4px solid rgba(212,175,55,0.85);
         }
         
         .guest-name {
             font-size: 20px;
-            font-weight: bold;
-            color: #0B2A4A;
+            font-weight: 700;
+            color: #1b2454;
             margin-bottom: 5px;
         }
         
@@ -327,18 +387,18 @@ class InvitationService:
         .detail-icon {
             width: 40px;
             height: 40px;
-            background: #1E88E5;
+            background: linear-gradient(135deg, #c79c2b, #e6c972);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 15px;
-            color: white;
+            color: #1b2454;
             font-size: 18px;
         }
         
         .detail-content h3 {
-            color: #0B2A4A;
+            color: #1b2454;
             font-size: 16px;
             margin-bottom: 5px;
         }
@@ -349,10 +409,11 @@ class InvitationService:
         }
         
         .program {
-            background: #f8f9fa;
+            background: #fbfbfb;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
+            border: 1px solid rgba(212,175,55,0.25);
         }
         
         .program h3 {
@@ -374,8 +435,8 @@ class InvitationService:
         }
         
         .program-time {
-            font-weight: bold;
-            color: #1E88E5;
+            font-weight: 700;
+            color: #1b2454;
             min-width: 60px;
         }
         
@@ -389,15 +450,16 @@ class InvitationService:
             text-align: center;
             margin: 30px 0;
             padding: 20px;
-            background: #f8f9fa;
+            background: #ffffff;
             border-radius: 10px;
+            border: 1px solid rgba(212,175,55,0.25);
         }
         
         .qr-code {
             width: 150px;
             height: 150px;
             margin: 0 auto 15px;
-            border: 3px solid #1E88E5;
+            border: 3px solid rgba(212,175,55,0.85);
             border-radius: 10px;
             padding: 10px;
             background: white;
@@ -428,27 +490,34 @@ class InvitationService:
         }
         
         .rsvp-accept {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
+            background: linear-gradient(135deg, #d4af37, #f3e8a3);
+            color: #1b2454;
+            border: 1px solid rgba(212,175,55,0.9);
         }
         
         .rsvp-accept:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+            box-shadow: 0 6px 18px rgba(212,175,55,0.35);
         }
+
+        /* sheen effect */
+        .rsvp-accept::after { content:''; position:absolute; inset:0; border-radius:25px; background: linear-gradient(120deg, rgba(255,255,255,0.0) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.0) 70%); transform: translateX(-100%); transition: transform .8s ease; }
+        .rsvp-accept:hover::after { transform: translateX(100%); }
         
         .rsvp-decline {
-            background: linear-gradient(135deg, #dc3545, #e83e8c);
-            color: white;
+            background: transparent;
+            color: #1b2454;
+            border: 1px solid #cbd0df;
+            backdrop-filter: blur(4px);
         }
         
         .rsvp-decline:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
         }
         
         .footer {
-            background: #0B2A4A;
+            background: #101935;
             color: white;
             padding: 20px 30px;
             text-align: center;
@@ -464,9 +533,9 @@ class InvitationService:
         }
         
         .deadline {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
+            background: #fffaf1;
+            border: 1px solid rgba(212,175,55,0.4);
+            color: #5d4a12;
             padding: 10px;
             border-radius: 5px;
             margin: 20px 0;
@@ -503,9 +572,13 @@ class InvitationService:
             <div class="logo">EXP</div>
             <h1 class="event-title">{{ invitation_data.event.title }}</h1>
             <p class="event-subtitle">{{ invitation_data.event.subtitle }}</p>
+            <div class="date-badge">{{ invitation_data.event.datetime | format_datetime }}</div>
+            <div class="ornament tl"></div>
+            <div class="ornament br"></div>
         </div>
         
         <div class="content">
+            <div class="divider"><span class="diamond"></span></div>
             <div class="greeting">
                 Kính gửi {{ invitation_data.guest.title }} {{ invitation_data.guest.name }},
             </div>

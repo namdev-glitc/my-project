@@ -351,7 +351,7 @@ const Reports: React.FC = () => {
     <div className="space-y-6">
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-6 border border-gray-700/50">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-10 h-10 bg-exp-gradient rounded-lg flex items-center justify-center">
@@ -366,7 +366,7 @@ const Reports: React.FC = () => {
             </div>
             
             {/* Event Selector */}
-            <div className="flex items-center space-x-4 mt-3">
+            <div className="flex flex-wrap items-center gap-2 mt-3">
               <div className="flex items-center space-x-2">
                 <Calendar size={16} className="text-blue-300" />
                 <span className="text-sm text-gray-300">Sự kiện:</span>
@@ -376,7 +376,7 @@ const Reports: React.FC = () => {
                     const event = events?.find((ev: any) => ev.id === parseInt(e.target.value));
                     setSelectedEvent(event);
                   }}
-                  className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                  className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm w-full sm:w-auto max-w-full"
                 >
                   {events?.map((event: any) => (
                     <option key={event.id} value={event.id}>
@@ -397,7 +397,7 @@ const Reports: React.FC = () => {
           </div>
           
           {/* Action Buttons */}
-          <div className="flex items-center space-x-3">
+          <div className="w-full grid grid-cols-3 gap-2 sm:w-auto sm:flex sm:items-center sm:space-x-3">
         <button
               onClick={() => setShowFilters(!showFilters)}
               className={`p-3 rounded-lg transition-colors ${
@@ -427,7 +427,7 @@ const Reports: React.FC = () => {
                 <select
                   value={refreshInterval}
                   onChange={(e) => setRefreshInterval(parseInt(e.target.value))}
-                  className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs"
+                  className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs w-full sm:w-auto"
                 >
                   <option value={15}>15s</option>
                   <option value={30}>30s</option>
@@ -437,17 +437,17 @@ const Reports: React.FC = () => {
               )}
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-2">
               <button
                 onClick={() => exportReport('excel')}
-          className="btn-exp flex items-center space-x-2"
+          className="btn-exp flex items-center justify-center space-x-2 w-full sm:w-auto"
         >
                 <FileText size={16} />
                 <span>Excel</span>
               </button>
         <button
                 onClick={() => exportReport('pdf')}
-          className="btn-exp flex items-center space-x-2"
+          className="btn-exp flex items-center justify-center space-x-2 w-full sm:w-auto"
         >
                 <Download size={16} />
                 <span>PDF</span>
@@ -543,7 +543,7 @@ const Reports: React.FC = () => {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex space-x-1 bg-gray-800/50 rounded-lg p-1">
+      <div className="grid grid-cols-4 gap-1 sm:flex sm:space-x-1 bg-gray-800/50 rounded-lg p-1 overflow-hidden">
         {[
           { id: 'overview', name: 'Tổng quan', icon: BarChart3 },
           { id: 'trends', name: 'Xu hướng', icon: LineChart },
@@ -555,14 +555,14 @@ const Reports: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-md transition-colors ${
+              className={`flex-1 flex items-center justify-center space-x-2 py-2 px-2 text-xs sm:text-sm sm:py-3 sm:px-4 rounded-md transition-colors truncate ${
                 activeTab === tab.id
                   ? 'bg-exp-gradient text-white'
                   : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
               }`}
             >
               <Icon size={16} />
-              <span className="text-sm font-medium">{tab.name}</span>
+              <span className="font-medium">{tab.name}</span>
         </button>
           );
         })}

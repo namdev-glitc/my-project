@@ -898,7 +898,7 @@ const Settings: React.FC = () => {
     <div className="space-y-6">
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 border border-gray-700">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center">
               <SettingsIcon size={32} className="mr-3 text-blue-400" />
@@ -910,18 +910,18 @@ const Settings: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="w-full grid grid-cols-3 gap-2 sm:w-auto sm:flex sm:items-center sm:space-x-3">
             {/* Action Buttons */}
             <button
               onClick={handleExportSettings}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center space-x-2"
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center space-x-2 w-full sm:w-auto"
               title="Xuất cài đặt"
             >
               <Download size={16} />
               <span>Xuất</span>
             </button>
             
-            <label className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center space-x-2 cursor-pointer">
+            <label className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center space-x-2 cursor-pointer w-full sm:w-auto">
               <Upload size={16} />
               <span>Nhập</span>
               <input
@@ -935,7 +935,7 @@ const Settings: React.FC = () => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="btn-exp flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-exp flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               {isSaving ? (
                 <RefreshCw size={20} className="animate-spin" />

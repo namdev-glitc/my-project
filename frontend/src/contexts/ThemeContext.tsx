@@ -25,8 +25,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     // Lưu theme vào localStorage
     localStorage.setItem('theme', theme);
     
-    // Cập nhật class trên document
-    if (theme === 'light') {
+    // Cập nhật class trên document: dark mode khi theme === 'dark'
+    if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');

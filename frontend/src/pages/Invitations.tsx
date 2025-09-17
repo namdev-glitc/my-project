@@ -262,6 +262,20 @@ const Invitations: React.FC = () => {
       return;
     }
 
+    // For Thiệp VIP (elegant), xem mẫu bằng giao diện trang khách mời để đồng nhất
+    if (selectedTemplate === 'elegant') {
+      // Ưu tiên khách mời đang chọn, nếu không lấy khách đầu tiên của sự kiện
+      const guestForPreview = selectedGuest
+        || (guests as any[])?.find((g: any) => g.event_id === selectedEvent.id)
+        || (guests as any[])?.[0];
+
+      if (guestForPreview) {
+        const url = `/invitation/${guestForPreview.id}?event=${selectedEvent.id}`;
+        window.open(url, '_blank');
+        return;
+      }
+    }
+
     try {
       setIsGenerating(true);
       const response = await fetch(`${API_BASE_URL}/api/invitations/preview`, {
@@ -294,9 +308,9 @@ const Invitations: React.FC = () => {
   const templates = [
     { 
       id: 'elegant', 
-      name: 'Thanh lịch (Mặc định)', 
+      name: 'Thiệp VIP', 
       icon: '✨', 
-      description: 'Thiết kế sang trọng - Mẫu hay dùng nhất',
+      description: 'Thiết kế sang trọng tông Gold – mặc định',
       category: 'formal',
       colors: { primary: '#0B2A4A', accent: '#1E88E5' },
       isDefault: true
@@ -338,7 +352,7 @@ const Invitations: React.FC = () => {
     <div className="space-y-6">
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-6 border border-gray-700/50">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-10 h-10 bg-exp-gradient rounded-lg flex items-center justify-center">
@@ -352,7 +366,7 @@ const Invitations: React.FC = () => {
               </div>
             </div>
             {selectedEvent && (
-              <div className="flex items-center space-x-4 mt-3 text-sm">
+              <div className="flex flex-wrap items-center gap-2 mt-3 text-sm">
                 <div className="flex items-center space-x-2 text-blue-300">
                   <Calendar size={16} />
                   <span>{new Date(selectedEvent.event_date).toLocaleDateString('vi-VN')}</span>
@@ -369,16 +383,16 @@ const Invitations: React.FC = () => {
             )}
           </div>
           
-          <div className="flex space-x-3">
+          <div className="w-full grid grid-cols-3 gap-2 sm:w-auto sm:flex sm:space-x-3">
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
+              className="p-2 sm:p-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors w-full sm:w-auto flex items-center justify-center"
             >
               <Palette size={20} className="text-white" />
             </button>
             <button
               onClick={previewTemplate}
-              className="btn-exp flex items-center space-x-2"
+              className="btn-exp flex items-center justify-center space-x-2 w-full sm:w-auto"
             >
               <Eye size={20} />
               <span>Xem mẫu</span>
@@ -386,7 +400,7 @@ const Invitations: React.FC = () => {
             <button
               onClick={generateAllInvitations}
               disabled={isGenerating || !selectedEvent}
-              className="btn-exp flex items-center space-x-2 disabled:opacity-50"
+              className="btn-exp flex items-center justify-center space-x-2 disabled:opacity-50 w-full sm:w-auto"
             >
               {isGenerating ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -402,24 +416,30 @@ const Invitations: React.FC = () => {
       {/* Enhanced Template Selection - Only show when event is selected */}
       {selectedEvent && (
         <div className="card-exp">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white flex items-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white flex items-center break-words">
               <Palette size={20} className="mr-2" />
-              Mẫu thiệp mời cho: <span className="text-blue-400 ml-2">{selectedEvent.name}</span>
+              Mẫu thiệp mời cho:
+              <span className="text-blue-400 ml-2 whitespace-normal break-words">
+                {selectedEvent.name}
+              </span>
             </h3>
-            <div className="flex items-center space-x-3">
-              <div className="text-sm text-gray-400">
-                Template hiện tại: <span className="text-white font-medium">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 gap-2 sm:gap-0">
+              <div className="text-sm text-gray-400 whitespace-normal break-words">
+                Template hiện tại:
+                <span className="text-white font-medium ml-1">
                   {templates.find(t => t.id === selectedTemplate)?.name}
                 </span>
               </div>
-              <button
-                onClick={() => setShowTemplateEditor(!showTemplateEditor)}
-                className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm flex items-center space-x-1"
-              >
-                <Settings size={14} />
-                <span>Tùy chỉnh</span>
-              </button>
+              <div className="sm:w-auto w-full">
+                <button
+                  onClick={() => setShowTemplateEditor(!showTemplateEditor)}
+                  className="w-full sm:w-auto px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm flex items-center justify-center space-x-1"
+                >
+                  <Settings size={14} />
+                  <span>Tùy chỉnh</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -442,7 +462,7 @@ const Invitations: React.FC = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {templates.map((template) => (
               <button
                 key={template.id}
@@ -638,13 +658,13 @@ const Invitations: React.FC = () => {
               Xem trước template
             </h4>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Preview Controls */}
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:space-x-3">
                   <button
                     onClick={() => previewTemplate()}
-                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white flex items-center space-x-2"
+                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white flex items-center justify-center space-x-2 w-full sm:w-auto"
                   >
                     <Eye size={16} />
                     <span>Xem mẫu</span>
@@ -658,7 +678,7 @@ const Invitations: React.FC = () => {
                       }
                     }}
                     disabled={!selectedGuest}
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center space-x-2 disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center space-x-2 disabled:opacity-50 w-full sm:w-auto"
                   >
                     <Sparkles size={16} />
                     <span>Preview với khách mời</span>
@@ -681,9 +701,9 @@ const Invitations: React.FC = () => {
                     dangerouslySetInnerHTML={{ __html: previewData.html_content }}
                     style={{ 
                       fontFamily: templateCustomization.fontFamily,
-                      transform: 'scale(0.8)',
+                      transform: 'scale(0.9)',
                       transformOrigin: 'top left',
-                      width: '125%'
+                      width: '112%'
                     }}
                   />
                 ) : (

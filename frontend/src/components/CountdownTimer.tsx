@@ -81,13 +81,13 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
     return (
       <div className={`bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${className}`}>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 min-w-0">
             <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
               <Clock size={24} />
             </div>
             <div>
               <h3 className="text-xl font-bold">Sự kiện sắp tới</h3>
-              <p className="text-blue-100">{eventName}</p>
+              <p className="text-blue-100 truncate max-w-[55vw] sm:max-w-none">{eventName}</p>
               {eventLocation && (
                 <p className="text-blue-200 text-sm flex items-center mt-1">
                   <MapPin size={14} className="mr-1" />
@@ -96,7 +96,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
               )}
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right flex-shrink-0">
             <p className="text-blue-100 text-sm">Ngày sự kiện</p>
             <p className="text-lg font-semibold">
               {new Date(eventDate).toLocaleDateString('vi-VN')}

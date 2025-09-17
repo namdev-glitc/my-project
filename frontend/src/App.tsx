@@ -8,6 +8,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import Guests from './pages/Guests';
 import Events from './pages/Events';
@@ -40,6 +41,7 @@ function App() {
             <div className="App">
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route path="/" element={
                   <ProtectedRoute>
                     <Layout>

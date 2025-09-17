@@ -153,18 +153,18 @@ const Guests: React.FC = () => {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-orange-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
       
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between">
-        <div>
+      <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">Quản lý Khách mời</h1>
           <p className="text-gray-300 mt-2 text-lg">
             Quản lý danh sách khách mời và RSVP
           </p>
         </div>
-        <div className="flex space-x-3">
+        <div className="w-full grid grid-cols-3 gap-2 sm:w-auto sm:flex sm:space-x-3">
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="group relative overflow-hidden bg-gradient-to-r from-red-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-red-500/25 flex items-center space-x-2"
+              className="group relative overflow-hidden bg-gradient-to-r from-red-600 to-pink-600 text-white py-2 sm:py-3 px-3 sm:px-6 rounded-xl font-semibold hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-red-500/25 flex items-center justify-center space-x-2 w-full sm:w-auto col-span-3 sm:col-span-1"
             >
               <Trash2 size={20} className="group-hover:scale-110 transition-transform duration-300" />
               <span>{allSelected ? 'Xóa tất cả' : `Xóa đã chọn (${selectedIds.length})`}</span>
@@ -172,24 +172,24 @@ const Guests: React.FC = () => {
           )}
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-green-500/25 flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 sm:py-3 px-3 sm:px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-green-500/25 flex items-center justify-center space-x-2 w-full sm:w-auto"
           >
             <Upload size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>Import CSV</span>
           </button>
-          <button 
-            onClick={handleExportExcel}
-            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 flex items-center space-x-2"
-          >
-            <Download size={20} className="group-hover:scale-110 transition-transform duration-300" />
-            <span>Xuất Excel</span>
-          </button>
           <button
             onClick={handleAddNew}
-            className="group relative overflow-hidden bg-gradient-to-r from-orange-600 to-pink-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-orange-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-orange-500/25 flex items-center space-x-2"
+            className="group relative overflow-hidden bg-gradient-to-r from-orange-600 to-pink-600 text-white py-2 sm:py-3 px-3 sm:px-6 rounded-xl font-semibold hover:from-orange-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-orange-500/25 flex items-center justify-center space-x-2 w-full sm:w-auto"
           >
             <Plus size={20} className="group-hover:scale-110 transition-transform duration-300" />
             <span>Thêm khách mời</span>
+          </button>
+          <button 
+            onClick={handleExportExcel}
+            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 sm:py-3 px-3 sm:px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 flex items-center justify-center space-x-2 w-full sm:w-auto"
+          >
+            <Download size={20} className="group-hover:scale-110 transition-transform duration-300" />
+            <span>Xuất Excel</span>
           </button>
         </div>
       </div>

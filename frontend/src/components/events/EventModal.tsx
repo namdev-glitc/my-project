@@ -25,10 +25,19 @@ const EventModal: React.FC<EventModalProps> = ({
 
   useEffect(() => {
     if (event) {
+      const dateStr = event.event_date ? event.event_date.split('T')[0] : '';
+      let timeStr = '';
+      if (event.event_date) {
+        const d = new Date(event.event_date);
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        timeStr = `${hh}:${mm}`;
+      }
       reset({
         name: event.name || '',
         description: event.description || '',
-        event_date: event.event_date ? event.event_date.split('T')[0] : '',
+        event_date: dateStr,
+        event_time: timeStr,
         location: event.location || '',
         max_guests: event.max_guests || 100,
         is_active: event.is_active !== undefined ? event.is_active : true
@@ -38,6 +47,7 @@ const EventModal: React.FC<EventModalProps> = ({
         name: '',
         description: '',
         event_date: '',
+        event_time: '',
         location: '',
         max_guests: 100,
         is_active: true
@@ -47,10 +57,14 @@ const EventModal: React.FC<EventModalProps> = ({
 
   const onSubmit = async (data: any) => {
     // Prepare data according to backend schema
+    const isoDateTime = data.event_date
+      ? new Date(`${data.event_date}T${data.event_time || '00:00'}`).toISOString()
+      : new Date().toISOString();
+
     const eventData = {
       name: data.name,
       description: data.description,
-      event_date: data.event_date ? new Date(data.event_date).toISOString() : new Date().toISOString(),
+      event_date: isoDateTime,
       location: data.location,
       max_guests: parseInt(data.max_guests) || 100,
       is_active: data.is_active !== undefined ? data.is_active : true
@@ -131,21 +145,33 @@ const EventModal: React.FC<EventModalProps> = ({
                   />
                 </div>
 
-                {/* Event Date */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Ngày sự kiện *
-                  </label>
-                  <input
-                    type="date"
-                    {...register('event_date', { required: 'Ngày sự kiện là bắt buộc' })}
-                    className="w-full input-exp"
-                  />
-                  {errors.event_date && (
-                    <p className="text-red-400 text-xs mt-1">
-                      {String(errors.event_date?.message || 'Lỗi validation')}
-                    </p>
-                  )}
+                {/* Event Date & Time */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Ngày sự kiện *
+                    </label>
+                    <input
+                      type="date"
+                      {...register('event_date', { required: 'Ngày sự kiện là bắt buộc' })}
+                      className="w-full input-exp"
+                    />
+                    {errors.event_date && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {String(errors.event_date?.message || 'Lỗi validation')}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Giờ sự kiện
+                    </label>
+                    <input
+                      type="time"
+                      {...register('event_time')}
+                      className="w-full input-exp"
+                    />
+                  </div>
                 </div>
 
                 {/* Location and Max Guests */}

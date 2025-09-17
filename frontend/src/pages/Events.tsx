@@ -304,12 +304,12 @@ const Events: React.FC = () => {
           </div>
           
           {/* Filter Dropdowns */}
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 gap-3 w-full sm:w-auto sm:flex">
             <div className="relative">
               <select 
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 pr-10 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer min-w-[160px] hover:bg-white/15 transition-colors text-sm font-medium"
+                className="px-4 py-3 pr-10 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer w-full sm:min-w-[160px] hover:bg-white/15 transition-colors text-sm font-medium"
               >
                 <option value="" className="bg-gray-800 text-white py-2">Tất cả trạng thái</option>
                 <option value="active" className="bg-gray-800 text-white py-2">Hoạt động</option>
@@ -325,7 +325,7 @@ const Events: React.FC = () => {
               <select 
                 value={monthFilter}
                 onChange={(e) => setMonthFilter(e.target.value)}
-                className="px-4 py-3 pr-10 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer min-w-[160px] hover:bg-white/15 transition-colors text-sm font-medium"
+                className="px-4 py-3 pr-10 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer w-full sm:min-w-[160px] hover:bg-white/15 transition-colors text-sm font-medium"
               >
                 <option value="" className="bg-gray-800 text-white py-2">Tất cả tháng</option>
                 <option value="this-month" className="bg-gray-800 text-white py-2">Tháng này</option>
