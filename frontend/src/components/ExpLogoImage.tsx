@@ -28,12 +28,12 @@ const ExpLogoImage: React.FC<ExpLogoImageProps> = ({
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      {/* Logo Image - Full size */}
-      <div className={`${sizeClasses[size]} relative`}>
-        <img 
-          src="/logo.png" 
-          alt="EXP Technology Logo" 
-          className="w-full h-full object-cover rounded-full"
+      {/* Logo Image with subtle bounce animation for both mobile and desktop */}
+      <div className={`${sizeClasses[size]} relative animate-bounce-smooth`}>
+        <img
+          src="/logo.png"
+          alt="EXP Technology Logo"
+          className="w-full h-full object-cover rounded-full drop-shadow-[0_0_12px_rgba(99,102,241,0.45)]"
         />
       </div>
     </div>

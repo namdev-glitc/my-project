@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Calendar, MapPin, CheckCircle, XCircle, QrCode, Download, Share2, Mail, Phone, ExternalLink } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { getGuest, getEvent, updateGuestRSVP } from '../services/api';
+import { getGuest, getEvent, updateGuestRSVP, getGuestQR } from '../services/api';
 import ExpLogoImage from '../components/ExpLogoImage';
 
 interface Guest {
@@ -45,6 +45,19 @@ const Invitation: React.FC = () => {
         }
 
         const guestData = await getGuest(parseInt(guestId));
+
+        // Ensure QR info present if available
+        try {
+          if (!guestData.qr_image_url) {
+            const qrResp = await getGuestQR(guestData.id);
+            if (qrResp?.qr_image_url) {
+              guestData.qr_image_url = qrResp.qr_image_url;
+              guestData.qr_code = qrResp.qr_data;
+            }
+          }
+        } catch (e) {
+          // QR may not exist yet; ignore
+        }
         setGuest(guestData);
 
         const resolvedEventId = eventIdFromQuery
@@ -74,7 +87,19 @@ const Invitation: React.FC = () => {
     setSubmitting(true);
     try {
       await updateGuestRSVP(guest.id, { rsvp_status: status });
-      setGuest({ ...guest, rsvp_status: status });
+      let updated = { ...guest, rsvp_status: status } as Guest;
+      // Try to fetch QR after accepting
+      if (status === 'accepted') {
+        try {
+          const qrResp = await getGuestQR(guest.id);
+          if (qrResp?.qr_image_url) {
+            updated = { ...updated, qr_image_url: qrResp.qr_image_url, qr_code: qrResp.qr_data };
+          }
+        } catch (_) {
+          // ignore if not available
+        }
+      }
+      setGuest(updated);
       toast.success(status === 'accepted' ? 'Đã xác nhận tham dự!' : 'Đã từ chối lời mời');
     } catch (error: any) {
       console.error('Lỗi cập nhật RSVP:', error);
@@ -108,22 +133,22 @@ const Invitation: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[radial-gradient(1200px_800px_at_50%_-200px,rgba(27,36,84,1)_0%,rgba(21,15,46,1)_50%,rgba(10,10,26,1)_100%)]">
+    <div className="min-h-screen relative overflow-x-hidden bg-[radial-gradient(1200px_800px_at_50%_-200px,rgba(27,36,84,1)_0%,rgba(21,15,46,1)_50%,rgba(10,10,26,1)_100%)]">
       {/* Background Ornaments */}
       <div className="pointer-events-none absolute inset-0 opacity-20">
         <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-gradient-to-br from-yellow-500/10 to-amber-500/0 blur-3xl"></div>
         <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-gradient-to-tr from-fuchsia-500/10 to-purple-500/0 blur-3xl"></div>
       </div>
 
-      <div className="container mx-auto px-4 py-10 relative z-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center bg-[conic-gradient(from_180deg_at_50%_50%,#6d28d9_0%,#22d3ee_25%,#8b5cf6_50%,#22d3ee_75%,#6d28d9_100%)] p-[2px] animate-bounce">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-4 sm:mb-6 flex items-center justify-center bg-[conic-gradient(from_180deg_at_50%_50%,#6d28d9_0%,#22d3ee_25%,#8b5cf6_50%,#22d3ee_75%,#6d28d9_100%)] p-[2px]">
             <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.35)]">
               <ExpLogoImage size="sm" showText={false} />
             </div>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-2 sm:mb-3">
             Thiệp mời tham dự
           </h1>
           <div className="relative w-40 mx-auto mt-3">
@@ -133,17 +158,17 @@ const Invitation: React.FC = () => {
         </div>
 
         {/* Main Card */}
-        <div className="max-w-4xl mx-auto bg-slate-900/70 text-white backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-yellow-500/20">
+        <div className="w-full mx-auto bg-slate-900/70 text-white backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-yellow-500/20 max-w-md sm:max-w-2xl md:max-w-3xl lg:max-w-4xl">
           {/* Event Info */}
-          <div className="relative bg-slate-900/80 text-white p-8 sm:p-12">
+          <div className="relative bg-slate-900/80 text-white p-4 sm:p-8">
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
             
             <div className="relative z-10">
-              <div className="text-center mb-8">
+              <div className="text-center mb-6 sm:mb-8">
                 <h2
-                  className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 bg-gradient-to-r from-purple-300 via-indigo-300 to-cyan-300 bg-clip-text text-transparent"
+                  className="text-2xl sm:text-5xl font-extrabold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-purple-300 via-indigo-300 to-cyan-300 bg-clip-text text-transparent"
                   style={{
                     textShadow:
                       '0 0 8px rgba(139,92,246,0.6), 0 0 16px rgba(99,102,241,0.45), 0 0 28px rgba(34,211,238,0.35)'
@@ -158,60 +183,16 @@ const Invitation: React.FC = () => {
                 )}
               </div>
               
-              <div className="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto">
-                <div className="flex items-center space-x-4 p-5 sm:p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-purple-400/30 shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-indigo-400/10 ring-2 ring-purple-400/50">
-                    <Calendar className="h-6 w-6 text-purple-300" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg text-white">
-                      {event.event_date ? new Date(event.event_date).toLocaleDateString('vi-VN', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      }) : 'Chủ Nhật, 15 tháng 12, 2024'}
-                    </p>
-                    <p className="text-gray-300/90">
-                      {event.event_date ? new Date(event.event_date).toLocaleTimeString('vi-VN', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      }) : '18:00'}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-4 p-5 sm:p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-purple-400/30 shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-fuchsia-500/20 to-purple-400/10 ring-2 ring-fuchsia-300/50">
-                    <MapPin className="h-6 w-6 text-fuchsia-300" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-lg text-white">Địa điểm</p>
-                    <p className="text-gray-300/90 mb-2">{event.location || 'Trung tâm Hội nghị Quốc gia'}</p>
-                    <button
-                      onClick={() => {
-                        const location = event.location || 'Trung tâm Hội nghị Quốc gia';
-                        const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
-                        window.open(searchUrl, '_blank');
-                      }}
-                      className="text-purple-300 hover:text-purple-200 text-sm font-medium flex items-center space-x-1 transition-colors hover:bg-purple-400/10 px-2 py-1 rounded-lg"
-                    >
-                      <MapPin className="h-4 w-4" />
-                      <span>Xem trên Google Maps</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+              {/* Removed small date/time and location cards per request */}
             </div>
           </div>
 
           {/* Guest Info */}
-          <div className="p-8 sm:p-12">
-            <div className="text-center mb-12">
+          <div className="p-6 sm:p-10">
+            <div className="text-center mb-10 sm:mb-12">
               <div className="inline-block p-[2px] rounded-2xl mb-6 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(212,175,55,0.8)_0%,rgba(255,255,255,0.8)_20%,rgba(212,175,55,0.8)_40%,rgba(184,134,11,0.8)_60%,rgba(241,230,178,0.9)_80%,rgba(212,175,55,0.8)_100%)]">
                 <div className="rounded-2xl bg-slate-900/80 p-6">
-                  <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 ring-4 ring-yellow-400/40 shadow-[0_12px_24px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 ring-4 ring-yellow-400/40 shadow-[0_12px_24px_rgba(0,0,0,0.3)] flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
                     {guest.name.charAt(0).toUpperCase()}
                   </span>
@@ -219,7 +200,7 @@ const Invitation: React.FC = () => {
                 </div>
               </div>
               <h3
-                className="text-3xl sm:text-4xl font-extrabold text-white mb-3"
+                className="text-2xl sm:text-4xl font-extrabold text-white mb-2 sm:mb-3"
                 style={{
                   textShadow:
                     '0 0 8px rgba(139,92,246,0.6), 0 0 16px rgba(99,102,241,0.45), 0 0 28px rgba(34,211,238,0.35)'
@@ -227,7 +208,7 @@ const Invitation: React.FC = () => {
               >
                 Xin chào {guest.name}!
               </h3>
-              <p className="text-lg sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
                 Bạn được mời tham dự sự kiện đặc biệt kỷ niệm 15 năm thành lập công ty. 
                 Chúng tôi rất mong được chào đón bạn!
               </p>
@@ -235,7 +216,7 @@ const Invitation: React.FC = () => {
 
             {/* RSVP Status */}
             {guest.rsvp_status === 'pending' && (
-              <div className="text-center mb-12">
+              <div className="text-center mb-10 sm:mb-12">
                 <div className="bg-white/5 p-8 rounded-3xl border border-white/10 mb-8">
                   <p className="text-2xl text-white mb-6 font-medium">
                     Vui lòng xác nhận tham dự của bạn
@@ -244,7 +225,7 @@ const Invitation: React.FC = () => {
                     Chúng tôi cần biết bạn có thể tham dự để chuẩn bị tốt nhất cho sự kiện
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 justify-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 justify-center">
                   <button
                     onClick={() => handleRSVP('accepted')}
                     disabled={submitting}
@@ -273,7 +254,7 @@ const Invitation: React.FC = () => {
                   <span className="text-xl font-bold">Đã xác nhận tham dự</span>
                 </div>
                 
-                <div className="bg-white/5 p-8 rounded-3xl border border-white/10 mb-8">
+                <div className="bg-white/5 p-6 sm:p-8 rounded-3xl border border-white/10 mb-6 sm:mb-8">
                   <p className="text-xl text-white mb-6 font-medium">
                     🎉 Cảm ơn bạn đã xác nhận tham dự!
                   </p>
@@ -284,7 +265,7 @@ const Invitation: React.FC = () => {
                 </div>
 
                 {/* QR Code */}
-                <div className="bg-slate-800/60 p-8 sm:p-10 rounded-3xl shadow-xl border border-yellow-500/20">
+                <div className="bg-slate-800/60 p-6 sm:p-10 rounded-3xl shadow-xl border border-yellow-500/20">
                   <div className="text-center mb-8">
                     <h4 className="text-2xl font-bold text-white mb-2">
                       QR Code Check-in
@@ -294,13 +275,13 @@ const Invitation: React.FC = () => {
                     </p>
                   </div>
                   
-                  <div className="flex justify-center mb-8">
+                  <div className="flex justify-center mb-6 sm:mb-8">
                     {guest.qr_image_url ? (
                       <div className="relative">
                         <img
                           src={`${guest.qr_image_url}`}
                           alt="QR Code"
-                          className="w-64 h-64 border-4 border-yellow-400/40 rounded-2xl shadow-lg bg-white"
+                          className="w-56 h-56 sm:w-64 sm:h-64 border-4 border-yellow-400/40 rounded-2xl shadow-lg bg-white"
                           onError={(e) => {
                             console.error('Lỗi tải QR code:', e);
                             e.currentTarget.style.display = 'none';
@@ -311,7 +292,7 @@ const Invitation: React.FC = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="w-64 h-64 bg-gray-200 rounded-2xl flex flex-col items-center justify-center">
+                      <div className="w-56 h-56 sm:w-64 sm:h-64 bg-gray-200 rounded-2xl flex flex-col items-center justify-center">
                         <QrCode size={64} className="text-gray-400 mb-4" />
                         <p className="text-sm text-gray-500">Đang tải QR code...</p>
                       </div>
@@ -323,7 +304,7 @@ const Invitation: React.FC = () => {
                       📱 Đưa QR code này cho nhân viên check-in tại sự kiện
                     </p>
                     
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                       <button
                         onClick={() => {
                           if (guest.qr_image_url) {
@@ -365,7 +346,7 @@ const Invitation: React.FC = () => {
             )}
 
             {guest.rsvp_status === 'declined' && (
-              <div className="text-center mb-12">
+              <div className="text-center mb-10 sm:mb-12">
                 <div className="inline-flex items-center space-x-3 px-8 py-4 bg-red-500/10 text-red-300 rounded-2xl mb-8 border border-red-400/30">
                   <XCircle size={24} />
                   <span className="text-xl font-bold">Đã từ chối lời mời</span>
@@ -381,12 +362,75 @@ const Invitation: React.FC = () => {
               </div>
             )}
 
+            {/* Timeline & Program */}
+            <div className="grid md:grid-cols-2 gap-4 sm:gap-6 mb-10">
+              {/* Time & Location */}
+              <div className="bg-white/5 rounded-2xl border border-white/10 p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]"></div>
+                  <h5 className="text-white font-semibold text-sm sm:text-base bg-gradient-to-r from-sky-300 to-cyan-300 bg-clip-text text-transparent" style={{textShadow: '0 0 12px rgba(56,189,248,0.6), 0 0 24px rgba(56,189,248,0.4)'}}>Thời gian & Địa điểm</h5>
+                </div>
+                <ul className="space-y-2 text-sm sm:text-base">
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="mt-1 text-sky-300">●</span>
+                    <span>
+                      {event.event_date
+                        ? new Date(event.event_date).toLocaleString('vi-VN', {
+                            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                          })
+                        : 'Thứ Sáu, 15 tháng 12, 2024 lúc 18:00'}
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="mt-1 text-indigo-300">●</span>
+                    <span>{event.location || 'Nhà hàng/Trung tâm Hội nghị'}</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-gray-300">
+                    <span className="mt-1 text-purple-300">●</span>
+                    <button
+                      onClick={() => {
+                        const location = event.location || 'Trung tâm Hội nghị Quốc gia';
+                        const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+                        window.open(searchUrl, '_blank');
+                      }}
+                      className="text-purple-300 hover:text-purple-200 underline underline-offset-2"
+                    >
+                      Xem trên Google Maps
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Program */}
+              <div className="bg-white/5 rounded-2xl border border-white/10 p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></div>
+                  <h5 className="text-white font-semibold text-sm sm:text-base bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent" style={{textShadow: '0 0 12px rgba(99,102,241,0.6), 0 0 24px rgba(99,102,241,0.4)'}}>Chương trình</h5>
+                </div>
+                <ul className="space-y-2">
+                  <li className="grid grid-cols-[54px_1fr] gap-3 text-sm sm:text-base">
+                    <span className="text-indigo-300 font-semibold text-right pr-1">18:00</span>
+                    <span className="text-gray-300">Check-in đón khách</span>
+                  </li>
+                  <li className="grid grid-cols-[54px_1fr] gap-3 text-sm sm:text-base">
+                    <span className="text-indigo-300 font-semibold text-right pr-1">18:30</span>
+                    <span className="text-gray-300">Khai mạc</span>
+                  </li>
+                  <li className="grid grid-cols-[54px_1fr] gap-3 text-sm sm:text-base">
+                    <span className="text-indigo-300 font-semibold text-right pr-1">19:00</span>
+                    <span className="text-gray-300">Tiệc & Giao lưu</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
             {/* Contact Info */}
-            <div className="bg-slate-800/60 p-8 rounded-3xl border border-yellow-500/20">
-              <h4 className="text-2xl font-bold text-white mb-6 text-center">
+            <div className="bg-slate-800/60 p-6 sm:p-8 rounded-3xl border border-yellow-500/20">
+              <h4 className="text-2xl font-bold text-white mb-6 text-center bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent" style={{textShadow: '0 0 16px rgba(251,191,36,0.7), 0 0 32px rgba(251,191,36,0.5)'}}>
                 📞 Thông tin liên hệ
               </h4>
-              <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto">
                 <div className="flex items-center space-x-4 p-4 bg-white/10 rounded-xl border border-white/20">
                   <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
                     <Phone size={20} className="text-green-400" />
@@ -412,7 +456,9 @@ const Invitation: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-300">Email khách mời</p>
-                      <p className="font-semibold text-white">{guest.email}</p>
+                    <p className="font-semibold text-white text-sm sm:text-base break-words">
+                      {guest.email}
+                    </p>
                     </div>
                   </div>
                 )}

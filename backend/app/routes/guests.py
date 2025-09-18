@@ -270,13 +270,22 @@ def get_guest_qr(guest_id: int, db: Session = Depends(get_db)):
     if not guest:
         raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
     
+    # Tự động tạo QR nếu chưa có
     if not guest.qr_image_path:
-        raise HTTPException(status_code=404, detail="Không tìm thấy QR code")
+        qr_data = qr_service.generate_qr_code(
+            guest_id=guest.id,
+            guest_name=guest.name,
+            event_id=guest.event_id,
+        )
+        guest.qr_code = qr_data["qr_data"]
+        guest.qr_image_path = qr_data["qr_image_path"]
+        db.commit()
+        db.refresh(guest)
     
     return {
         "qr_data": guest.qr_code,
         "qr_image_path": guest.qr_image_path,
-        "qr_image_url": f"/qr_images/{os.path.basename(guest.qr_image_path)}"
+        "qr_image_url": f"/qr_images/{os.path.basename(guest.qr_image_path)}",
     }
 
 @router.get("/{guest_id}/qr/image")
