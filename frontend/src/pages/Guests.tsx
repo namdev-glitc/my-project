@@ -305,6 +305,7 @@ const Guests: React.FC = () => {
           onUpdate={updateGuestMutation.mutate}
           onCreate={createGuestMutation.mutate}
           isLoading={updateGuestMutation.isLoading || createGuestMutation.isLoading}
+          events={events || []}
         />
       )}
 

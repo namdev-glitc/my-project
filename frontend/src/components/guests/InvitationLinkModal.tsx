@@ -55,7 +55,7 @@ const InvitationLinkModal: React.FC<InvitationLinkModalProps> = ({
   };
 
   const sendEmail = () => {
-    const subject = `Thiệp mời tham dự ${event.name}`;
+    const subject = `EXP TECHNOLOGY - ${event.name}`;
     const body = `Xin chào ${guest.name},\n\nBạn được mời tham dự sự kiện "${event.name}" vào ngày ${event.date} tại ${event.location}.\n\nVui lòng xác nhận tham dự tại link: ${invitationLink}\n\nTrân trọng!`;
     
     const mailtoLink = `mailto:${guest.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

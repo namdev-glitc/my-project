@@ -149,33 +149,33 @@ const EnhancedInvitationPreview: React.FC<EnhancedInvitationPreviewProps> = ({
               <div className="relative z-10 p-8 h-full flex flex-col">
                 {/* Header with Logo */}
                 <div className="text-center mb-8">
-                  <div className="relative inline-block mb-4">
+                  <div className="flex items-center justify-center gap-4 mb-4">
                     {customization.logo ? (
                       <img 
                         src={customization.logo} 
                         alt="Logo" 
-                        className="w-16 h-16 mx-auto rounded-full shadow-lg hover:scale-110 transition-transform duration-300"
+                        className="w-16 h-16 rounded-full shadow-lg hover:scale-110 transition-transform duration-300"
                         style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }}
                       />
                     ) : (
                       <div 
-                        className="w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300"
+                        className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300"
                         style={{ 
                           background: `linear-gradient(135deg, ${customization.primaryColor}, ${customization.accentColor})`,
                           boxShadow: `0 8px 32px ${customization.primaryColor}40`
                         }}
                       >
-                        <Crown className="text-white" size={32} />
+                        <Crown className="text-white" size={24} />
                       </div>
                     )}
+                    
+                    <h1 
+                      className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent"
+                      style={{ fontFamily: customization.fontFamily }}
+                    >
+                      EXP TECHNOLOGY
+                    </h1>
                   </div>
-                  
-                  <h1 
-                    className="text-4xl font-bold mb-2 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent"
-                    style={{ fontFamily: customization.fontFamily }}
-                  >
-                    Thiệp mời tham dự
-                  </h1>
                   <div 
                     className="w-24 h-1 mx-auto rounded-full"
                     style={{ background: `linear-gradient(90deg, ${customization.accentColor}, ${customization.primaryColor})` }}

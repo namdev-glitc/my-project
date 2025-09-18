@@ -291,14 +291,14 @@ class InvitationService:
         
         .logo {
             width: 88px;
-            height: 88px;
+            height: 44px;
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: 1px;
             color: #fff8e7;

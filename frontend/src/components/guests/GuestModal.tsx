@@ -11,6 +11,7 @@ interface GuestModalProps {
   onUpdate?: (data: { id: number; data: any }) => void;
   onCreate?: (data: any) => void;
   isLoading?: boolean;
+  events?: any[];
 }
 
 const GuestModal: React.FC<GuestModalProps> = ({
@@ -19,7 +20,8 @@ const GuestModal: React.FC<GuestModalProps> = ({
   onClose,
   onUpdate,
   onCreate,
-  isLoading = false
+  isLoading = false,
+  events = []
 }) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -34,7 +36,8 @@ const GuestModal: React.FC<GuestModalProps> = ({
         email: guest.email || '',
         phone: guest.phone || '',
         rsvp_status: guest.rsvp_status || 'pending',
-        rsvp_notes: guest.rsvp_notes || ''
+        rsvp_notes: guest.rsvp_notes || '',
+        event_id: guest.event_id || (events.length > 0 ? events[0].id : 1)
       });
     } else {
       reset({
@@ -46,10 +49,11 @@ const GuestModal: React.FC<GuestModalProps> = ({
         email: '',
         phone: '',
         rsvp_status: 'pending',
-        rsvp_notes: ''
+        rsvp_notes: '',
+        event_id: events.length > 0 ? events[0].id : 1
       });
     }
-  }, [guest, reset]);
+  }, [guest, reset, events]);
 
   // Auto scroll to top when modal opens
   useEffect(() => {
@@ -68,9 +72,9 @@ const GuestModal: React.FC<GuestModalProps> = ({
       }
     } else {
       if (onCreate) {
-        onCreate({ ...data, event_id: 1 });
+        onCreate(data);
       } else {
-        await createGuest({ ...data, event_id: 1 });
+        await createGuest(data);
         toast.success('Thêm khách mời thành công!');
       }
     }
@@ -101,6 +105,43 @@ const GuestModal: React.FC<GuestModalProps> = ({
               </div>
 
               <div className="space-y-4">
+                {/* Event Selection - Only show when creating new guest */}
+                {!guest && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Sự kiện *
+                    </label>
+                    <select
+                      {...register('event_id', { required: 'Vui lòng chọn sự kiện' })}
+                      className="w-full input-exp"
+                    >
+                      {events && events.length > 0 ? (
+                        events.map((event) => (
+                          <option key={event.id} value={event.id}>
+                            {event.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value={1}>Sự kiện 15 năm thành lập công ty</option>
+                      )}
+                    </select>
+                    {errors.event_id && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {String(errors.event_id?.message || 'Lỗi validation')}
+                      </p>
+                    )}
+                  </div>
+                )}
+                
+                {/* Debug info */}
+                {!guest && (!events || events.length === 0) && (
+                  <div className="bg-yellow-900 bg-opacity-20 border border-yellow-500 rounded-lg p-3">
+                    <p className="text-yellow-400 text-sm">
+                      Đang tải danh sách sự kiện... ({events?.length || 0} sự kiện)
+                    </p>
+                  </div>
+                )}
+
                 {/* Title and Name */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>

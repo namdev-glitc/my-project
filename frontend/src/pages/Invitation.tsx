@@ -143,14 +143,16 @@ const Invitation: React.FC = () => {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10 relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-4 sm:mb-6 flex items-center justify-center bg-[conic-gradient(from_180deg_at_50%_50%,#6d28d9_0%,#22d3ee_25%,#8b5cf6_50%,#22d3ee_75%,#6d28d9_100%)] p-[2px]">
-            <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.35)]">
-              <ExpLogoImage size="sm" showText={false} />
+          <div className="flex items-center justify-center gap-4 mb-4 sm:mb-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center bg-[conic-gradient(from_180deg_at_50%_50%,#6d28d9_0%,#22d3ee_25%,#8b5cf6_50%,#22d3ee_75%,#6d28d9_100%)] p-[2px]">
+              <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.35)]">
+                <ExpLogoImage size="sm" showText={false} />
+              </div>
             </div>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              EXP TECHNOLOGY
+            </h1>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-2 sm:mb-3">
-            Thiệp mời tham dự
-          </h1>
           <div className="relative w-40 mx-auto mt-3">
             <div className="h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
             <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(139,92,246,0.9)]"></div>
