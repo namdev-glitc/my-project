@@ -19,6 +19,18 @@ const QRScanner: React.FC = () => {
     try {
       setError(null);
       
+      // Check if we're on HTTPS or localhost
+      const isSecure = window.location.protocol === 'https:' || 
+                      window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' ||
+                      window.location.hostname.startsWith('192.168.');
+      
+      if (!isSecure) {
+        setError('Camera chỉ hoạt động trên HTTPS hoặc localhost. Vui lòng sử dụng HTTPS hoặc truy cập từ mạng local.');
+        setIsScanning(false);
+        return;
+      }
+      
       // Check if we already have a scanner running
       if (qrScannerRef.current) {
         await qrScannerRef.current.start();
@@ -41,6 +53,19 @@ const QRScanner: React.FC = () => {
         return;
       }
 
+      // Check camera permissions first
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+        // Stop the test stream
+        stream.getTracks().forEach(track => track.stop());
+      } catch (permissionErr) {
+        setError('Không có quyền truy cập camera. Vui lòng cho phép truy cập camera và thử lại.');
+        setIsScanning(false);
+        return;
+      }
+
       qrScannerRef.current = new QrScanner(
         videoRef.current,
         (result) => {
@@ -59,7 +84,24 @@ const QRScanner: React.FC = () => {
       await qrScannerRef.current.start();
 
     } catch (err) {
-      setError(`Lỗi khởi động camera: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.error('Camera error:', err);
+      let errorMessage = 'Unknown error';
+      
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError') {
+          errorMessage = 'Không có quyền truy cập camera. Vui lòng cho phép truy cập camera.';
+        } else if (err.name === 'NotFoundError') {
+          errorMessage = 'Không tìm thấy camera. Vui lòng kiểm tra camera.';
+        } else if (err.name === 'NotSupportedError') {
+          errorMessage = 'Trình duyệt không hỗ trợ camera. Vui lòng sử dụng trình duyệt khác.';
+        } else if (err.message.includes('https')) {
+          errorMessage = 'Camera chỉ hoạt động trên HTTPS. Vui lòng sử dụng HTTPS.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(`Lỗi khởi động camera: ${errorMessage}`);
       setIsScanning(false);
     }
   };
@@ -233,10 +275,17 @@ const QRScanner: React.FC = () => {
 
           {error && (
             <div className="bg-red-900 bg-opacity-20 border border-red-500 rounded-lg p-4 mb-4">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 mb-3">
                 <AlertCircle size={20} className="text-red-400" />
-                <p className="text-red-400">{error}</p>
+                <p className="text-red-400 font-medium">{error}</p>
               </div>
+              {error.includes('HTTPS') && (
+                <div className="bg-blue-900 bg-opacity-20 border border-blue-500 rounded-lg p-3 mt-3">
+                  <p className="text-blue-400 text-sm">
+                    <strong>Giải pháp:</strong> Truy cập qua địa chỉ local: <code className="bg-gray-700 px-2 py-1 rounded">http://192.168.1.136</code>
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
