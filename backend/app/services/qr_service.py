@@ -11,6 +11,12 @@ class QRService:
         # Tạo thư mục nếu chưa tồn tại
         os.makedirs(self.qr_images_dir, exist_ok=True)
     
+    def _sanitize(self, value: str) -> str:
+        safe = ''.join(ch if ch.isalnum() or ch in ['-', '_'] else '_' for ch in value.strip())
+        while '__' in safe:
+            safe = safe.replace('__', '_')
+        return safe or 'guest'
+
     def generate_qr_code(self, guest_id: int, guest_name: str, event_id: int) -> dict:
         """
         Tạo QR code cho khách mời
@@ -41,7 +47,8 @@ class QRService:
         img = qr.make_image(fill_color="black", back_color="white")
         
         # Lưu file
-        filename = f"guest_{guest_id}_{qr_id}.png"
+        safe_guest = self._sanitize(guest_name)
+        filename = f"guest_{guest_id}_{safe_guest}_{qr_id}.png"
         filepath = os.path.join(self.qr_images_dir, filename)
         img.save(filepath)
         

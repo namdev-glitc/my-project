@@ -10,6 +10,10 @@ from ..services.csv_service import CSVService
 from datetime import datetime
 import json
 import os
+import time
+from jose import jwt
+from urllib.parse import urlencode
+import os
 
 router = APIRouter(prefix="/guests", tags=["guests"])
 
@@ -270,8 +274,8 @@ def get_guest_qr(guest_id: int, db: Session = Depends(get_db)):
     if not guest:
         raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
     
-    # Tự động tạo QR nếu chưa có
-    if not guest.qr_image_path:
+    # Tự động tạo QR nếu chưa có (hoặc file không tồn tại)
+    if not guest.qr_image_path or not os.path.exists(guest.qr_image_path):
         qr_data = qr_service.generate_qr_code(
             guest_id=guest.id,
             guest_name=guest.name,
@@ -301,6 +305,35 @@ def get_guest_qr_image(guest_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Không tìm thấy file QR code")
     
     return FileResponse(guest.qr_image_path, media_type="image/png")
+
+# -------------------------
+# Invite link generation
+# -------------------------
+@router.post("/{guest_id}/invite_link", response_model=dict)
+def generate_invite_link(guest_id: int, db: Session = Depends(get_db)):
+    """
+    Tạo link thiệp mời công khai (không cần đăng nhập) cho khách mời.
+    Link chứa token an toàn (JWT) mã hóa guest_id và event_id, hết hạn sau 30 ngày.
+    """
+    guest = db.query(Guest).filter(Guest.id == guest_id).first()
+    if not guest:
+        raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
+
+    secret_key = os.getenv("SECRET_KEY", "your-secret-key-here-change-in-production")
+    expires_in_seconds = 30 * 24 * 3600
+    payload = {
+        "sub": "invite",
+        "guest_id": guest.id,
+        "event_id": guest.event_id,
+        "exp": int(time.time()) + expires_in_seconds,
+    }
+    token = jwt.encode(payload, secret_key, algorithm="HS256")
+
+    # Base URL for frontend; try ENV, fallback to root
+    frontend_base = os.getenv("FRONTEND_BASE_URL", "")
+    invite_url = f"{frontend_base}/i/{token}" if frontend_base else f"/i/{token}"
+
+    return {"token": token, "url": invite_url, "expires_in": expires_in_seconds}
 
 @router.post("/{guest_id}/rsvp")
 def update_guest_rsvp(guest_id: int, rsvp_data: dict, db: Session = Depends(get_db)):
@@ -422,5 +455,31 @@ def export_guests_csv(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi export CSV: {str(e)}")
 
+
+# -------------------------
+# Public invitation by token
+# -------------------------
+@router.get("/invite/{token}", response_model=GuestResponse)
+def get_invitation_by_token(token: str, db: Session = Depends(get_db)):
+    """
+    Trả về thông tin thiệp mời công khai dựa trên token (JWT) mà không cần đăng nhập.
+    """
+    try:
+        secret_key = os.getenv("SECRET_KEY", "your-secret-key-here-change-in-production")
+        data = jwt.decode(token, secret_key, algorithms=["HS256"])
+        if data.get("sub") != "invite":
+            raise HTTPException(status_code=400, detail="Token không hợp lệ")
+        guest_id = data.get("guest_id")
+        guest = db.query(Guest).filter(Guest.id == guest_id).first()
+        if not guest:
+            raise HTTPException(status_code=404, detail="Không tìm thấy khách mời")
+
+        guest_dict = guest.__dict__.copy()
+        guest_dict['qr_image_url'] = f"/qr_images/{os.path.basename(guest.qr_image_path)}" if guest.qr_image_path else None
+        return guest_dict
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Token không hợp lệ hoặc đã hết hạn: {str(e)}")
 
 

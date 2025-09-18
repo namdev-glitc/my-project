@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Copy, Mail, MessageSquare, Share2, Calendar, MapPin, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { generateInviteLink } from '../../services/api';
 
 interface InvitationLinkModalProps {
   isOpen: boolean;
@@ -35,13 +36,28 @@ const InvitationLinkModal: React.FC<InvitationLinkModalProps> = ({
     }
   }, [isOpen]);
   
-  // Kiểm tra guest và event có tồn tại không
+  const [invitationLink, setInvitationLink] = useState<string>('');
+
+  useEffect(() => {
+    const build = async () => {
+      if (!guest) return;
+      try {
+        const { url } = await generateInviteLink(guest.id);
+        const base = window.location.origin;
+        // Nếu API trả về path tương đối, nối với origin
+        setInvitationLink(url.startsWith('http') ? url : `${base}${url}`);
+      } catch (e: any) {
+        // Fallback tạm thời: dùng route cũ theo ID (cần đăng nhập)
+        setInvitationLink(`${window.location.origin}/invitation/${guest.id}?event=${event.id}`);
+      }
+    };
+    build();
+  }, [guest, event]);
+ 
+  // Kiểm tra guest và event có tồn tại không (sau khi khai báo hooks)
   if (!guest || !event) {
     return null;
   }
-  
-  // Tạo link mời dựa trên guest ID và event ID
-  const invitationLink = `${window.location.origin}/invitation/${guest.id}?event=${event.id}`;
   
   const copyToClipboard = async () => {
     try {
@@ -50,7 +66,21 @@ const InvitationLinkModal: React.FC<InvitationLinkModalProps> = ({
       toast.success('Đã sao chép link mời!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      toast.error('Không thể sao chép link');
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = invitationLink;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        setCopied(true);
+        toast.success('Đã sao chép link mời!');
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast.error('Không thể sao chép link');
+      }
     }
   };
 

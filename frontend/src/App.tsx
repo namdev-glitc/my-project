@@ -18,6 +18,7 @@ import Settings from './pages/Settings';
 import Invitations from './pages/Invitations';
 import CheckIn from './pages/CheckIn';
 import Invitation from './pages/Invitation';
+import InvitationPublic from './pages/InvitationPublic';
 import './App.css';
 import './exp-brand.css';
 
@@ -105,6 +106,8 @@ function App() {
                     </Layout>
                   </ProtectedRoute>
                 } />
+                {/* Public invitation route by token (no auth) */}
+                <Route path="/i/:token" element={<InvitationPublic />} />
               </Routes>
             <Toaster
               position="top-right"

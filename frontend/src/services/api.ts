@@ -116,6 +116,17 @@ export const getGuestQR = async (id: number) => {
   return response.data;
 };
 
+// Public Invitation by token
+export const getInvitationByToken = async (token: string) => {
+  const response = await api.get(`/guests/invite/${token}`);
+  return response.data;
+};
+
+export const generateInviteLink = async (guestId: number) => {
+  const response = await api.post(`/guests/${guestId}/invite_link`);
+  return response.data as { token: string; url: string; expires_in: number };
+};
+
 export const importGuests = async (file: File, eventId: number) => {
   const formData = new FormData();
   formData.append('file', file);

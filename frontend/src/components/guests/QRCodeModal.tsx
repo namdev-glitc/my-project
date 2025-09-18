@@ -10,6 +10,8 @@ interface QRCodeModalProps {
 const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [qrData, setQrData] = useState<any>(null);
+  const [bust, setBust] = useState<number>(Date.now());
 
 
   const generateQRCode = useCallback(async () => {
@@ -21,13 +23,14 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
       const response = await fetch(`/api/guests/${guest.id}/qr`);
       if (response.ok) {
         const data = await response.json();
+        setQrData(data.qr_data ? JSON.parse(data.qr_data) : null);
         if (data.qr_image_url) {
-          setQrCodeUrl(`${data.qr_image_url}`);
+          const raw = `${data.qr_image_url}?v=${Date.now()}`;
+          setQrCodeUrl(encodeURI(raw));
         } else {
           // Fallback: tạo QR code từ dữ liệu
-          const qrData = JSON.parse(data.qr_data);
           const qrCodeDataURL = await import('qrcode').then(qr => 
-            qr.toDataURL(JSON.stringify(qrData), {
+            qr.toDataURL(JSON.stringify(JSON.parse(data.qr_data)), {
               width: 256,
               margin: 2,
               color: {
@@ -47,6 +50,31 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
       setLoading(false);
     }
   }, [guest]);
+  const handleImageError = useCallback(async () => {
+    try {
+      // Thử refetch QR để tạo lại nếu thiếu file
+      const response = await fetch(`/api/guests/${guest.id}/qr`);
+      if (response.ok) {
+        const data = await response.json();
+        setQrData(data.qr_data ? JSON.parse(data.qr_data) : null);
+        if (data.qr_image_url) {
+          setBust(Date.now());
+          setQrCodeUrl(encodeURI(`${data.qr_image_url}?v=${Date.now()}`));
+          return;
+        }
+      }
+    } catch {}
+    // Cuối cùng: render QR client-side từ qrData
+    if (qrData) {
+      import('qrcode').then(qr => {
+        qr.toDataURL(JSON.stringify(qrData), {
+          width: 256,
+          margin: 2,
+          color: { dark: '#0B2A4A', light: '#FFFFFF' }
+        }).then(setQrCodeUrl);
+      });
+    }
+  }, [guest, qrData]);
 
   useEffect(() => {
     if (isOpen && guest) {
@@ -96,7 +124,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, guest }) => 
           ) : qrCodeUrl ? (
             <div>
               <div className="bg-white p-4 rounded-lg border-2 border-gray-200 inline-block mb-4">
-                <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
+                <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" onError={handleImageError} />
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-gray-600">

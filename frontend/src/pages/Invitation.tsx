@@ -109,6 +109,29 @@ const Invitation: React.FC = () => {
     }
   };
 
+  // Retry fetching QR when image fails to load
+  const [qrTriedOnce, setQrTriedOnce] = useState<boolean>(false);
+  const [qrBust, setQrBust] = useState<number>(Date.now());
+  const handleQrLoadError = async () => {
+    try {
+      if (!guest || qrTriedOnce) return;
+      setQrTriedOnce(true);
+      const qrResp = await getGuestQR(guest.id);
+      if (qrResp?.qr_image_url) {
+        setGuest({
+          ...guest,
+          qr_image_url: qrResp.qr_image_url,
+          qr_code: qrResp.qr_data,
+        });
+        setQrBust(Date.now());
+      } else {
+        toast.error('Không tìm thấy QR code, vui lòng thử lại sau');
+      }
+    } catch (e) {
+      toast.error('Lỗi tạo/tải QR code');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -143,7 +166,7 @@ const Invitation: React.FC = () => {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10 relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-4 mb-4 sm:mb-6">
+          <div className="flex items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center bg-[conic-gradient(from_180deg_at_50%_50%,#6d28d9_0%,#22d3ee_25%,#8b5cf6_50%,#22d3ee_75%,#6d28d9_100%)] p-[2px]">
               <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.35)]">
                 <ExpLogoImage size="sm" showText={false} />
@@ -153,6 +176,7 @@ const Invitation: React.FC = () => {
               EXP TECHNOLOGY
             </h1>
           </div>
+          <p className="text-sm sm:text-base text-gray-300 mt-2">Từ Thái Nguyên vươn xa, 15 năm thành lập</p>
           <div className="relative w-40 mx-auto mt-3">
             <div className="h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
             <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(139,92,246,0.9)]"></div>
@@ -167,26 +191,7 @@ const Invitation: React.FC = () => {
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
             
-            <div className="relative z-10">
-              <div className="text-center mb-6 sm:mb-8">
-                <h2
-                  className="text-2xl sm:text-5xl font-extrabold tracking-tight mb-3 sm:mb-4 bg-gradient-to-r from-purple-300 via-indigo-300 to-cyan-300 bg-clip-text text-transparent"
-                  style={{
-                    textShadow:
-                      '0 0 8px rgba(139,92,246,0.6), 0 0 16px rgba(99,102,241,0.45), 0 0 28px rgba(34,211,238,0.35)'
-                  }}
-                >
-                  {event.name}
-                </h2>
-                {event.description && (
-                  <p className="text-lg sm:text-xl text-gray-200/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-                    {event.description}
-                  </p>
-                )}
-              </div>
-              
-              {/* Removed small date/time and location cards per request */}
-            </div>
+            <div className="relative z-10" />
           </div>
 
           {/* Guest Info */}
@@ -208,11 +213,10 @@ const Invitation: React.FC = () => {
                     '0 0 8px rgba(139,92,246,0.6), 0 0 16px rgba(99,102,241,0.45), 0 0 28px rgba(34,211,238,0.35)'
                 }}
               >
-                Xin chào {guest.name}!
+                Kính gửi {guest.name}!
               </h3>
               <p className="text-base sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
-                Bạn được mời tham dự sự kiện đặc biệt kỷ niệm 15 năm thành lập công ty. 
-                Chúng tôi rất mong được chào đón bạn!
+                Chúng tôi rất vinh dự khi được cùng bạn tham gia sự kiện thành lập 10/10/2010 - 10/10/2025.
               </p>
             </div>
 
@@ -234,7 +238,7 @@ const Invitation: React.FC = () => {
                     className="group flex items-center justify-center space-x-3 px-10 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 rounded-2xl hover:from-amber-500 hover:to-yellow-600 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-yellow-400/40"
                   >
                     <CheckCircle size={24} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-lg font-bold tracking-wide">Đồng ý tham dự</span>
+                    <span className="text-lg font-bold tracking-wide">Xác nhận tham dự</span>
                   </button>
                   
                   <button
@@ -280,15 +284,18 @@ const Invitation: React.FC = () => {
                   <div className="flex justify-center mb-6 sm:mb-8">
                     {guest.qr_image_url ? (
                       <div className="relative">
-                        <img
-                          src={`${guest.qr_image_url}`}
+                        {(() => {
+                          const raw = `${guest.qr_image_url}?v=${qrBust}`;
+                          const encoded = encodeURI(raw);
+                          return (
+                            <img
+                              src={encoded}
                           alt="QR Code"
                           className="w-56 h-56 sm:w-64 sm:h-64 border-4 border-yellow-400/40 rounded-2xl shadow-lg bg-white"
-                          onError={(e) => {
-                            console.error('Lỗi tải QR code:', e);
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
+                          onError={handleQrLoadError}
+                            />
+                          );
+                        })()}
                         <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                           <CheckCircle size={16} className="text-white" />
                         </div>
@@ -373,9 +380,12 @@ const Invitation: React.FC = () => {
                   <h5 className="text-white font-semibold text-sm sm:text-base bg-gradient-to-r from-sky-300 to-cyan-300 bg-clip-text text-transparent" style={{textShadow: '0 0 12px rgba(56,189,248,0.6), 0 0 24px rgba(56,189,248,0.4)'}}>Thời gian & Địa điểm</h5>
                 </div>
                 <ul className="space-y-2 text-sm sm:text-base">
-                  <li className="flex items-start gap-2 text-gray-300">
-                    <span className="mt-1 text-sky-300">●</span>
-                    <span>
+                  <li className="flex items-center gap-3 p-3 rounded-xl bg-sky-500/10 border border-sky-400/30 shadow-[0_0_20px_rgba(56,189,248,0.25)]">
+                    <Calendar className="w-5 h-5 text-sky-300 flex-shrink-0" />
+                    <span
+                      className="font-bold text-white text-base sm:text-lg tracking-wide"
+                      style={{ textShadow: '0 0 10px rgba(56,189,248,0.6), 0 0 20px rgba(56,189,248,0.3)' }}
+                    >
                       {event.event_date
                         ? new Date(event.event_date).toLocaleString('vi-VN', {
                             weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
