@@ -37,6 +37,7 @@ const GuestModal: React.FC<GuestModalProps> = ({
         phone: guest.phone || '',
         rsvp_status: guest.rsvp_status || 'pending',
         rsvp_notes: guest.rsvp_notes || '',
+        checked_in: guest.checked_in || false,
         event_id: guest.event_id || (events.length > 0 ? events[0].id : 1)
       });
     } else {
@@ -50,6 +51,7 @@ const GuestModal: React.FC<GuestModalProps> = ({
         phone: '',
         rsvp_status: 'pending',
         rsvp_notes: '',
+        checked_in: false,
         event_id: events.length > 0 ? events[0].id : 1
       });
     }
@@ -63,6 +65,11 @@ const GuestModal: React.FC<GuestModalProps> = ({
   }, [isOpen]);
 
   const onSubmit = async (data: any) => {
+    // Convert string values to boolean for checked_in
+    if (data.checked_in !== undefined) {
+      data.checked_in = data.checked_in === 'true';
+    }
+    
     if (guest) {
       if (onUpdate) {
         onUpdate({ id: guest.id, data });
@@ -268,6 +275,35 @@ const GuestModal: React.FC<GuestModalProps> = ({
                     placeholder="Ghi chú thêm..."
                   />
                 </div>
+
+                {/* Check-in Status - Only show when editing existing guest */}
+                {guest && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Trạng thái Check-in
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          {...register('checked_in')}
+                          value="true"
+                          className="mr-2"
+                        />
+                        <span className="text-white">Đã check-in</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          {...register('checked_in')}
+                          value="false"
+                          className="mr-2"
+                        />
+                        <span className="text-white">Chưa check-in</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

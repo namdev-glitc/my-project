@@ -141,6 +141,17 @@ def update_guest(guest_id: int, guest_update: GuestUpdate, db: Session = Depends
     for field, value in update_data.items():
         setattr(db_guest, field, value)
     
+    # Nếu đang set checked_in = True và chưa có check_in_time, set thời gian hiện tại
+    if update_data.get('checked_in') is True and not db_guest.check_in_time:
+        db_guest.check_in_time = datetime.now()
+        if not db_guest.check_in_location:
+            db_guest.check_in_location = 'Manual Update'
+    
+    # Nếu đang set checked_in = False, xóa thông tin check-in
+    if update_data.get('checked_in') is False:
+        db_guest.check_in_time = None
+        db_guest.check_in_location = None
+    
     db_guest.updated_at = datetime.now()
     db.commit()
     db.refresh(db_guest)
@@ -166,7 +177,7 @@ def update_rsvp(guest_id: int, rsvp: GuestRSVP, db: Session = Depends(get_db)):
     
     return db_guest
 
-@router.post("/{guest_id}/checkin", response_model=GuestResponse)
+@router.post("/{guest_id}/checkin")
 def checkin_guest(guest_id: int, checkin: GuestCheckIn, db: Session = Depends(get_db)):
     """
     Check-in khách mời
@@ -181,7 +192,11 @@ def checkin_guest(guest_id: int, checkin: GuestCheckIn, db: Session = Depends(ge
         
         if db_guest.checked_in:
             print(f"Guest {guest_id} already checked in")
-            raise HTTPException(status_code=400, detail="Khách mời đã check-in rồi")
+            # Trả về thông tin khách cùng cờ đã check-in trước đó
+            return {
+                "already_checked_in": True,
+                "guest": db_guest
+            }
         
         db_guest.checked_in = True
         db_guest.check_in_time = datetime.now()
@@ -192,7 +207,10 @@ def checkin_guest(guest_id: int, checkin: GuestCheckIn, db: Session = Depends(ge
         db.refresh(db_guest)
         
         print(f"Guest {guest_id} checked in successfully")
-        return db_guest
+        return {
+            "already_checked_in": False,
+            "guest": db_guest
+        }
     except Exception as e:
         print(f"Error checking in guest {guest_id}: {str(e)}")
         import traceback

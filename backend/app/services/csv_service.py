@@ -95,6 +95,29 @@ class CSVService:
         
         return cleaned
     
+    def _extract_minimal_guest_rows(self, guests: List[Any]) -> List[Dict[str, Any]]:
+        """
+        Chuẩn hoá danh sách khách mời thành chỉ 3 cột: id, name, organization.
+        Hỗ trợ cả dict và SQLAlchemy model (có attribute).
+        """
+        rows: List[Dict[str, Any]] = []
+        for g in guests:
+            # Support SQLAlchemy model or dict-like
+            try:
+                gid = getattr(g, 'id', None) if not isinstance(g, dict) else g.get('id')
+                name = getattr(g, 'name', None) if not isinstance(g, dict) else g.get('name')
+                org = getattr(g, 'organization', None) if not isinstance(g, dict) else g.get('organization')
+            except Exception:
+                gid = None
+                name = None
+                org = None
+            rows.append({
+                'id': gid if gid is not None else '',
+                'name': (name or ''),
+                'organization': (org or ''),
+            })
+        return rows
+    
     def export_guests_to_csv(self, guests: List[Dict[str, Any]], filename: str = None) -> str:
         """
         Xuất danh sách khách mời ra file CSV
@@ -110,8 +133,10 @@ class CSVService:
         
         file_path = os.path.join(export_dir, filename)
         
-        df = pd.DataFrame(guests)
-        df.to_csv(file_path, index=False, encoding='utf-8-sig')
+        # Chỉ xuất 3 cột: id|name|organization, không header, phân cách bằng '|'
+        rows = self._extract_minimal_guest_rows(guests)
+        df = pd.DataFrame(rows, columns=['id', 'name', 'organization'])
+        df.to_csv(file_path, index=False, header=False, sep='|', encoding='utf-8-sig')
         
         return file_path
     
@@ -130,8 +155,11 @@ class CSVService:
         
         file_path = os.path.join(export_dir, filename)
         
-        df = pd.DataFrame(guests)
-        df.to_excel(file_path, index=False, sheet_name='Guests')
+        # Xuất 3 cột: id, name, organization (không header) vào Excel
+        rows = self._extract_minimal_guest_rows(guests)
+        df = pd.DataFrame(rows, columns=['id', 'name', 'organization'])
+        # Dùng engine mặc định (openpyxl) để tránh thiếu dependency trong container
+        df.to_excel(file_path, index=False, header=False, sheet_name='Guests')
         
         return file_path
     

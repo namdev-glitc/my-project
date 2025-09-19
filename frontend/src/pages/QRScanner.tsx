@@ -12,6 +12,7 @@ const QRScanner: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
+  const isProcessingRef = useRef<boolean>(false);
 
 
 
@@ -19,14 +20,18 @@ const QRScanner: React.FC = () => {
     try {
       setError(null);
       
-      // Check if we're on HTTPS or localhost
+      // Check if we're on HTTPS or allowed local/IP hosts
+      const host = window.location.hostname;
+      const isPrivateIp = /^10\.|^172\.(1[6-9]|2\d|3[0-1])\.|^192\.168\./.test(host);
+      const isExplicitAllowedIp = host === '27.72.246.67';
       const isSecure = window.location.protocol === 'https:' || 
-                      window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1' ||
-                      window.location.hostname.startsWith('192.168.');
+                        host === 'localhost' || 
+                        host === '127.0.0.1' ||
+                        isPrivateIp ||
+                        isExplicitAllowedIp;
       
       if (!isSecure) {
-        setError('Camera chỉ hoạt động trên HTTPS hoặc localhost. Vui lòng sử dụng HTTPS hoặc truy cập từ mạng local.');
+        setError('Camera chỉ hoạt động trên HTTPS hoặc các IP nội bộ/được cho phép. Vui lòng dùng HTTPS hoặc truy cập địa chỉ nội bộ/đã cho phép.');
         setIsScanning(false);
         return;
       }
@@ -113,12 +118,13 @@ const QRScanner: React.FC = () => {
       qrScannerRef.current = null;
     }
     setIsScanning(false);
-    setScannedData(null);
-    setCheckinResult(null);
+    // Không xóa kết quả để hiển thị ở phần "Kết quả quét"
   };
 
   const handleQRCodeDetected = async (data: string) => {
     try {
+      if (isProcessingRef.current) return; // Ngăn quét trùng nhiều lần
+      isProcessingRef.current = true;
       let qrData;
       let guestId;
       
@@ -160,19 +166,25 @@ const QRScanner: React.FC = () => {
       
       if (guestId) {
         // Auto check-in
-        const result = await checkinGuest(guestId, {
+        const resp = await checkinGuest(guestId, {
           check_in_location: 'QR Scanner'
         });
-        
-        setCheckinResult(result);
-        toast.success('Check-in thành công!');
-        
+
+        // resp shape: { already_checked_in: boolean, guest: {...} }
+        const guest = resp?.guest || resp; // fallback if old shape
+        const already = resp?.already_checked_in === true;
+
+        setCheckinResult(guest);
+
         // Stop scanning after successful check-in
         stopScanning();
       }
     } catch (err) {
       console.error('Error processing QR code:', err);
       setError('Không thể xử lý QR code');
+    }
+    finally {
+      isProcessingRef.current = false;
     }
   };
 
@@ -295,21 +307,52 @@ const QRScanner: React.FC = () => {
                 <h4 className="text-white font-medium mb-2">Thông tin QR Code</h4>
                 <div className="space-y-2 text-sm">
                   <p><span className="text-gray-400">Guest ID:</span> <span className="text-white">{scannedData.guest_id}</span></p>
-                  <p><span className="text-gray-400">Tên:</span> <span className="text-white">{scannedData.guest_name}</span></p>
-                  <p><span className="text-gray-400">Event ID:</span> <span className="text-white">{scannedData.event_id}</span></p>
+                  {checkinResult?.name && (
+                    <p><span className="text-gray-400">Mr:</span> <span className="text-white">{checkinResult.name}</span></p>
+                  )}
+                  {checkinResult?.organization && (
+                    <p><span className="text-gray-400">Công ty:</span> <span className="text-white">{checkinResult.organization}</span></p>
+                  )}
                 </div>
               </div>
 
               {checkinResult && (
                 <div className="bg-green-900 bg-opacity-20 border border-green-500 rounded-lg p-4">
-                  <div className="flex items-center space-x-2 mb-2">
+                  <div className="flex items-center space-x-2 mb-3">
                     <CheckCircle size={20} className="text-green-400" />
-                    <p className="text-green-400 font-medium">Check-in thành công!</p>
+                    <p className="text-green-400 font-medium">
+                      {checkinResult.check_in_time ? 'Bạn đã check in thành công' : 'Bạn đã check in trước đó rồi'}
+                    </p>
                   </div>
-                  <div className="text-sm text-gray-300">
-                    <p>Khách mời: {checkinResult.name}</p>
-                    <p>Thời gian: {new Date(checkinResult.check_in_time).toLocaleString('vi-VN')}</p>
-                    <p>Vị trí: {checkinResult.check_in_location}</p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Mr:</span>
+                      <span className="text-white font-medium">{checkinResult.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Tổ chức:</span>
+                      <span className="text-white">{checkinResult.organization || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Email:</span>
+                      <span className="text-white">{checkinResult.email || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Số điện thoại:</span>
+                      <span className="text-white">{checkinResult.phone || 'N/A'}</span>
+                    </div>
+                    {checkinResult.check_in_time && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Thời gian check-in:</span>
+                          <span className="text-white">{new Date(checkinResult.check_in_time).toLocaleString('vi-VN')}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Vị trí:</span>
+                          <span className="text-white">{checkinResult.check_in_location}</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}

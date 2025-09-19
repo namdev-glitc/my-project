@@ -46,7 +46,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ guest, event, submittin
                 <ExpLogoImage size="sm" showText={false} />
               </div>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">EXP TECHNOLOGY</h1>
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">TECHNOLOGY</h1>
           </div>
           <p className="text-sm sm:text-base text-gray-300 mt-2">Từ Thái Nguyên vươn xa, 15 năm thành lập</p>
           <div className="relative w-40 mx-auto mt-3">
@@ -67,7 +67,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ guest, event, submittin
                 </div>
               </div>
               <h3 className="text-2xl sm:text-4xl font-extrabold text-white mb-2 sm:mb-3" style={{ textShadow: '0 0 8px rgba(139,92,246,0.6), 0 0 16px rgba(99,102,241,0.45), 0 0 28px rgba(34,211,238,0.35)' }}>
-                Kính gửi {guest.name}!
+                Kính gửi : {guest.name}!
               </h3>
               <p className="text-base sm:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
                 Chúng tôi rất vinh dự khi được cùng bạn tham gia sự kiện thành lập 10/10/2010 - 10/10/2025.
@@ -82,13 +82,13 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ guest, event, submittin
                   <p className="text-gray-300 mb-8">Chúng tôi cần biết bạn có thể tham dự để chuẩn bị tốt nhất cho sự kiện</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 justify-center">
-                  <button onClick={() => onRSVP?.('accepted')} disabled={submitting} className="group flex items-center justify-center space-x-3 px-10 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 rounded-2xl hover:from-amber-500 hover:to-yellow-600 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-yellow-400/40">
-                    <CheckCircle size={24} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-lg font-bold tracking-wide">Xác nhận tham dự</span>
+                  <button onClick={() => onRSVP?.('accepted')} disabled={submitting} className="group flex items-center justify-center gap-3 px-12 py-4 rounded-3xl bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-500 text-slate-900 font-bold tracking-wide shadow-[0_10px_30px_rgba(251,191,36,0.35)] ring-1 ring-yellow-300/40 hover:shadow-[0_12px_36px_rgba(251,191,36,0.45)] hover:translate-y-[-1px] transition-all disabled:opacity-50">
+                    <CheckCircle size={22} className="shrink-0" />
+                    <span className="text-lg">Xác nhận tham dự</span>
                   </button>
-                  <button onClick={() => onRSVP?.('declined')} disabled={submitting} className="group flex items-center justify-center space-x-3 px-10 py-4 border-2 border-white/60 text-gray-800 bg-white rounded-2xl hover:bg-gray-50 disabled:opacity-50 transition-all duration-300 transform hover:scale-105 shadow">
-                    <XCircle size={24} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-lg font-semibold">Từ chối</span>
+                  <button onClick={() => onRSVP?.('declined')} disabled={submitting} className="group flex items-center justify-center gap-3 px-12 py-4 rounded-3xl bg-white text-slate-800 font-semibold ring-1 ring-white/70 shadow-[0_6px_18px_rgba(0,0,0,0.12)] hover:bg-gray-50 hover:ring-white transition-all disabled:opacity-50">
+                    <XCircle size={20} className="shrink-0" />
+                    <span className="text-lg">Từ chối</span>
                   </button>
                 </div>
               </div>
@@ -147,6 +147,19 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ guest, event, submittin
                   <li className="flex items-start gap-2 text-gray-300">
                     <span className="mt-1 text-indigo-300">●</span>
                     <span>{event.location || 'Nhà hàng/Trung tâm Hội nghị'}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 text-purple-300">●</span>
+                    <button
+                      onClick={() => {
+                        const location = event.location || 'Trung tâm Hội nghị Quốc gia';
+                        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+                        window.open(url, '_blank');
+                      }}
+                      className="text-purple-300 hover:text-purple-200 underline underline-offset-2"
+                    >
+                      Xem trên Google Maps
+                    </button>
                   </li>
                 </ul>
               </div>

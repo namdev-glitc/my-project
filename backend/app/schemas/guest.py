@@ -33,6 +33,7 @@ class GuestUpdate(BaseModel):
     phone: Optional[str] = None
     rsvp_status: Optional[str] = None
     rsvp_notes: Optional[str] = None
+    checked_in: Optional[bool] = None
 
     @validator('email')
     def validate_email(cls, v):
